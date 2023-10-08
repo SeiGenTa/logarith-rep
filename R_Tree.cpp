@@ -26,7 +26,6 @@ vector<Nodo>&nearest_recursivo(vector<Nodo>&nodos,int m){
         for(int j=i*m;j<min((int)nodos.size(),(i+1)*m);j++){
             rec->push_back(nodos[j].MBR);
         }
-        // probar max/min por infinity
         double xmax, xmin, ymax, ymin;
 
         for(int k=0;k<rec->size();k++){
@@ -78,7 +77,6 @@ int nearestx(vector<Rectangulo>&Rectangulos,int m){
         for(int j=i*m;j<min((int)Rectangulos.size(),(i+1)*m);j++){
             rec->push_back(Rectangulos[j]);
         }
-        // probar max/min por infinity
         double xmax, xmin, ymax, ymin; 
         
         for(int k=0;k<rec->size();k++){
