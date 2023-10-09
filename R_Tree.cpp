@@ -26,15 +26,15 @@ vector<Nodo>&nearest_recursivo(vector<Nodo>&nodos,int m){
         for(int j=i*m;j<min((int)nodos.size(),(i+1)*m);j++){
             rec->push_back(nodos[j].MBR);
         }
-        double xmax, xmin, ymax, ymin;
+        double xmax = -1e9, xmin = 1e9, ymax = -1e9, ymin = 1e9;
 
         for(int k=0;k<rec->size();k++){
             xmax = max(xmax,(*rec)[k].x1);
             xmax = max(xmax,(*rec)[k].x2);
-            ymax = max(ymax,(*rec)[k].y1);
-            ymax = max(ymax,(*rec)[k].y2);
             xmin = min(xmin,(*rec)[k].x1);
             xmin = min(xmin,(*rec)[k].x2);
+            ymax = max(ymax,(*rec)[k].y1);
+            ymax = max(ymax,(*rec)[k].y2);
             ymin = min(ymin,(*rec)[k].y1);
             ymin = min(ymin,(*rec)[k].y2);
         }
@@ -77,15 +77,15 @@ int nearestx(vector<Rectangulo>&Rectangulos,int m){
         for(int j=i*m;j<min((int)Rectangulos.size(),(i+1)*m);j++){
             rec->push_back(Rectangulos[j]);
         }
-        double xmax, xmin, ymax, ymin; 
+        double xmax = -1e9, xmin = 1e9, ymax = -1e9, ymin = 1e9; 
         
         for(int k=0;k<rec->size();k++){
             xmax = max(xmax,(*rec)[k].x1);
             xmax = max(xmax,(*rec)[k].x2);
-            ymax = max(ymax,(*rec)[k].y1);
-            ymax = max(ymax,(*rec)[k].y2);
             xmin = min(xmin,(*rec)[k].x1);
             xmin = min(xmin,(*rec)[k].x2);
+            ymax = max(ymax,(*rec)[k].y1);
+            ymax = max(ymax,(*rec)[k].y2);
             ymin = min(ymin,(*rec)[k].y1);
             ymin = min(ymin,(*rec)[k].y2);
         }
@@ -97,3 +97,12 @@ int nearestx(vector<Rectangulo>&Rectangulos,int m){
     nearest_recursivo(*Nodos,m);
     return 0;
 } 
+
+int main() {
+
+    return 0;
+};
+
+
+
+
