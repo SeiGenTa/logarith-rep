@@ -1,3 +1,4 @@
+#include <iostream>
 #include<bits/stdc++.h> 
 #include <vector>
 using namespace std;
@@ -14,7 +15,7 @@ struct Nodo{
     vector<Nodo*> hijos;
 };
 
-void SortTileRecursive(vector<Nodo> Nodos, int M){
+int SortTileRecursive(vector<Nodo> Nodos, int M){
 
     //Caso base
     if (Nodos.size() <= M) {
@@ -42,7 +43,7 @@ void SortTileRecursive(vector<Nodo> Nodos, int M){
         }
 
         Nodos.push_back(Padre);
-        return;
+        return 0;
     }
 
     //Ordenamos los nodos segun su coordenada X
@@ -103,11 +104,11 @@ void SortTileRecursive(vector<Nodo> Nodos, int M){
     }
 
     SortTileRecursive(*Nodos2, M);
-
+    return 0;
 };
 
 //Esta funcion construye el R-Tree
-void ConstruirRtreeSTR(int M, vector<Rectangulo> rectangulos){
+int ConstruirRtreeSTR(int M, vector<Rectangulo> rectangulos){
     
     //Ordenando los primeros puntos segun su coordenada X
     sort(rectangulos.begin(), rectangulos.end(), [](const Rectangulo& izq, const Rectangulo& der) {
@@ -164,4 +165,10 @@ void ConstruirRtreeSTR(int M, vector<Rectangulo> rectangulos){
         }
     }
     SortTileRecursive(*Nodos, M);
+    return 0;
+};
+
+int main() {
+
+    return 0;
 };
