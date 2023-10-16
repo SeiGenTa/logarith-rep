@@ -88,11 +88,74 @@ int nearestx(vector<Rectangulo>&Rectangulos,int m){
         Nodo hoja = {mbr,*rec,*nulo};
         Nodos->push_back(hoja);
     }
-    nearest_recursivo(*Nodos,m);
+    nearest_recursivo(*Nodos,m).size();
     return 0;
 } 
 
+// Función para serializar un nodo
+void serializarNodo(ofstream& archivo, Nodo* nodo) {
+    if (!nodo) {
+        archivo.write(reinterpret_cast<char*>(0), sizeof(int));  // Indicador de nodo nulo
+    } else {
+        archivo.write(reinterpret_cast<char*>(nodo), sizeof(Nodo));
+        for (Rectangulo& rect : nodo->Rectangulos) {
+            archivo.write(reinterpret_cast<char*>(&rect), sizeof(Rectangulo));
+        }
+        int numHijos = nodo->Hijos.size();
+        archivo.write(reinterpret_cast<char*>(&numHijos), sizeof(int));
+        for (Nodo* hijo : nodo->Hijos) {
+            serializarNodo(archivo, hijo);
+        }
+    }
+}
+
+// Función para deserializar un nodo
+Nodo* deserializarNodo(ifstream& archivo) {
+    Nodo* nodo = new Nodo;
+    archivo.read(reinterpret_cast<char*>(nodo), sizeof(Nodo));
+    for (Rectangulo& rect : nodo->Rectangulos) {
+        archivo.read(reinterpret_cast<char*>(&rect), sizeof(Rectangulo));
+    }
+    int numHijos;
+    archivo.read(reinterpret_cast<char*>(&numHijos), sizeof(int));
+    for (int i = 0; i < numHijos; i++) {
+        Nodo* hijo = deserializarNodo(archivo);
+        nodo->Hijos.push_back(hijo);
+    }
+    return nodo;
+}
+
+// Función para guardar el árbol R-Tree en un archivo binario
+void guardarArbol(const char* nombreArchivo, Nodo* raiz) {
+    ofstream archivo(nombreArchivo, ios::binary);
+    serializarNodo(archivo, raiz);
+    archivo.close();
+}
+
+// Función para cargar el árbol R-Tree desde un archivo binario
+Nodo* cargarArbol(const char* nombreArchivo) {
+    ifstream archivo(nombreArchivo, ios::binary);
+    Nodo* raiz = deserializarNodo(archivo);
+    archivo.close();
+    return raiz;
+}
+
 int main() {
+    // Crea un conjunto de rectángulos de prueba
+    vector<Rectangulo> RectangulosPrueba;
+    Rectangulo r1 = {1.0, 2.0, 3.0, 4.0};
+    Rectangulo r2 = {2.0, 3.0, 4.0, 5.0};
+    RectangulosPrueba.push_back(r1);
+    RectangulosPrueba.push_back(r2);
+
+    // Define el valor de m (número máximo de hijos por nodo)
+    int m = 2;
+
+    // Llama a la función nearestx para construir el árbol y realizar la búsqueda
+    int resultado = nearestx(RectangulosPrueba, m);
+
+    // Imprime el resultado
+    cout << "Número de resultados encontrados: " << resultado << endl;
 
     return 0;
 };
