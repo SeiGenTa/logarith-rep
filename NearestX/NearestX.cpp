@@ -118,9 +118,9 @@ int main() {
 
     Node* root = buildRTree(rectangles, M);
     cout << "a" << endl;
-    saveRTree(root, "rtree.dat");
+    saveRTree(root, "rtree.bin");
     cout << "b" << endl;
-    Node* loadedRoot = loadRTree("rtree.dat");
+    Node* loadedRoot = loadRTree("rtree.bin");
     cout << "c" << endl;
     cout << "d" << endl;
 
