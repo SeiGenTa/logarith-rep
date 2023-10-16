@@ -63,7 +63,7 @@ class LeafNode{
     void* info;
 
     public:
-    //Iniciador de el LeafNode, por decirlo asi, aqui almacenaremos nuestro datos, para eso el puntero a void, pero quien sabe
+    //Iniciador de el LeafNode, por decirlo asi, aqui almacenaremos nuestro datos, para eso el puntero a void, pero quien sabe <--xDDDDD??
     LeafNode(int x1, int y1,int x2,int y2){
         mbr = {x1,y1,x2,y2};
         pair<int,int> centerMBR = mbr.getCenter();
