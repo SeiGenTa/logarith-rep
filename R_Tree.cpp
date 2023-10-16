@@ -17,10 +17,8 @@ struct Nodo{
 };
 
 vector<Nodo>&nearest_recursivo(vector<Nodo>&nodos,int m){
-    // Hasta aqui esta todo ordenado
     int maxi = ceil(nodos.size()/m);
     vector<Nodo>*Nodos = new vector<Nodo>;
-    //vector<Nodo>Nodos(maxi);
     for(int i=0; i<maxi;i++){
         vector<Rectangulo>*rec = new vector<Rectangulo>;
         for(int j=i*m;j<min((int)nodos.size(),(i+1)*m);j++){
@@ -65,10 +63,6 @@ int nearestx(vector<Rectangulo>&Rectangulos,int m){
         return (a.x1 + a.x2) / 2 < (b.x1 + b.x2) / 2;
     });
    
-    for(int i = 0 ; i<Rectangulos.size();i++){
-        cout << Rectangulos[i].x1 << " " ; 
-    }
-
     // Hasta aqui esta todo ordenado
     int maxi = ceil(Rectangulos.size()/m);
     vector<Nodo>*Nodos = new vector<Nodo>;
