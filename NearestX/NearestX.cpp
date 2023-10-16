@@ -1,204 +1,133 @@
 #include <iostream>
-#include <vector>
 #include <fstream>
+#include <vector>
 #include <algorithm>
-#include <cmath>
 
 using namespace std;
 
-// Estructura Rectángulo
-struct Rectangulo {
+struct Rectangle {
     double x1, y1, x2, y2;
+
+    Rectangle(double a = 0, double b = 0, double c = 0, double d = 0) : x1(a), y1(b), x2(c), y2(d) {}
 };
 
-// Estructura Nodo que posee rectángulo con sus hijos
-struct Nodo {
-    Rectangulo MBR;
-    vector<Rectangulo> Rectangulos;
-    vector<Nodo*> Hijos;
+struct Node {
+    Rectangle mbr;
+    vector<Node*> children; // Cambiamos a vector de nodos en lugar de rectángulos
+    Node* parent;
+
+    Node(Node* p = nullptr) : mbr(), parent(p) {}
 };
 
-// Función para calcular el área de un rectángulo
-double calcularArea(const Rectangulo& rect) {
-    return (rect.x2 - rect.x1) * (rect.y2 - rect.y1);
-}
+const int MAX_CHILDREN = 4;
 
-// Función para calcular el área del MBR de un nodo
-double calcularAreaMBR(const Nodo& nodo) {
-    return calcularArea(nodo.MBR);
-}
-
-// Función para comparar dos rectángulos por su coordenada X
-bool compararPorX(const Rectangulo& a, const Rectangulo& b) {
-    return (a.x1 + a.x2) / 2 < (b.x1 + b.x2) / 2;
-}
-
-// Función para construir un árbol R recursivamente
-Nodo* construirArbolR(vector<Rectangulo>& Rectangulos, int m) {
-    if (Rectangulos.empty()) {
+// Función para construir el R-tree
+Node* buildRTree(const vector<Rectangle>& rectangles, int m) {
+    if (rectangles.empty()) {
         return nullptr;
     }
 
-    if (Rectangulos.size() <= m) {
-        Nodo* nodoHoja = new Nodo;
-        nodoHoja->Rectangulos = Rectangulos;
-        nodoHoja->MBR = Rectangulos[0];
+    vector<Node*> nodes;
 
-        for (const Rectangulo& rect : Rectangulos) {
-            nodoHoja->MBR.x1 = min(nodoHoja->MBR.x1, rect.x1);
-            nodoHoja->MBR.y1 = min(nodoHoja->MBR.y1, rect.y1);
-            nodoHoja->MBR.x2 = max(nodoHoja->MBR.x2, rect.x2);
-            nodoHoja->MBR.y2 = max(nodoHoja->MBR.y2, rect.y2);
-        }
-
-        return nodoHoja;
+    for (const Rectangle& rect : rectangles) {
+        Node* node = new Node();
+        node->mbr = rect;
+        nodes.push_back(node);
     }
 
-    // Ordenar los rectángulos por coordenada X
-    sort(Rectangulos.begin(), Rectangulos.end(), compararPorX);
-
-    int division = ceil(sqrt(Rectangulos.size()));
-    vector<vector<Rectangulo>> divisiones;
-
-    for (int i = 0; i < division; i++) {
-        int inicio = i * (Rectangulos.size() / division);
-        int fin = (i + 1) * (Rectangulos.size() / division);
-        if (i == division - 1) {
-            fin = Rectangulos.size();
+    while (nodes.size() > 1) {
+        vector<Node*> nextLevel;
+        for (int i = 0; i < nodes.size(); i += m) {
+            Node* node = new Node();
+            node->children.assign(nodes.begin() + i, nodes.begin() + min(i + m, static_cast<int>(nodes.size())));
+            for (Node* child : node->children) {
+                if (child) {
+                    child->parent = node;
+                }
+            }
+            for (Node* child : node->children) {
+                if (child) {
+                    if (node->mbr.x1 == 0 && node->mbr.x2 == 0 && node->mbr.y1 == 0 && node->mbr.y2 == 0) {
+                        node->mbr = child->mbr;
+                    }
+                    node->mbr.x1 = min(node->mbr.x1, child->mbr.x1);
+                    node->mbr.y1 = min(node->mbr.y1, child->mbr.y1);
+                    node->mbr.x2 = max(node->mbr.x2, child->mbr.x2);
+                    node->mbr.y2 = max(node->mbr.y2, child->mbr.y2);
+                }
+            }
+            nextLevel.push_back(node);
         }
-        vector<Rectangulo> division(Rectangulos.begin() + inicio, Rectangulos.begin() + fin);
-        divisiones.push_back(division);
+        nodes = nextLevel;
     }
 
-    vector<Nodo*> hijos;
-    vector<Rectangulo> MBRHijos;
-
-    for (const vector<Rectangulo>& division : divisiones) {
-        Nodo* hijo = construirArbolR(division, m);
-        if (hijo) {
-            hijos.push_back(hijo);
-            MBRHijos.push_back(hijo->MBR);
-        }
-    }
-
-    Nodo* nodo = new Nodo;
-    nodo->Rectangulos = Rectangulos;
-    nodo->Hijos = hijos;
-
-    if (!MBRHijos.empty()) {
-        nodo->MBR = MBRHijos[0];
-        for (const Rectangulo& MBRHijo : MBRHijos) {
-            nodo->MBR.x1 = min(nodo->MBR.x1, MBRHijo.x1);
-            nodo->MBR.y1 = min(nodo->MBR.y1, MBRHijo.y1);
-            nodo->MBR.x2 = max(nodo->MBR.x2, MBRHijo.x2);
-            nodo->MBR.y2 = max(nodo->MBR.y2, MBRHijo.y2);
-        }
-    }
-
-    return nodo;
+    return nodes[0];
 }
 
-// Función para guardar un nodo en un archivo binario
-void guardarNodoEnArchivo(const Nodo* nodo, ofstream& archivo) {
-    if (nodo) {
-        // Guardar el MBR del nodo
-        archivo.write(reinterpret_cast<const char*>(&nodo->MBR), sizeof(Rectangulo));
-    
-        // Guardar el número de rectángulos en el nodo
-        int numRectangulos = nodo->Rectangulos.size();
-        archivo.write(reinterpret_cast<const char*>(&numRectangulos), sizeof(int));
 
-        // Guardar los rectángulos del nodo
-        for (const Rectangulo& rect : nodo->Rectangulos) {
-            archivo.write(reinterpret_cast<const char*>(&rect), sizeof(Rectangulo));
-        }
-
-        // Guardar los hijos
-        int numHijos = nodo->Hijos.size();
-        archivo.write(reinterpret_cast<const char*>(&numHijos), sizeof(int));
-        for (const Nodo* hijo : nodo->Hijos) {
-            guardarNodoEnArchivo(hijo, archivo);
-        }
+// Función para eliminar nodos
+void deleteNodes(Node* root) {
+    if (!root) {
+        return;
     }
+    for (Node* child : root->children) {
+        deleteNodes(child);
+    }
+    delete root;
 }
 
-// Función para guardar el árbol R en un archivo binario
-void guardarArbolR(Nodo* raiz, const string& nombreArchivo) {
-    ofstream archivo(nombreArchivo, ios::binary);
-    if (archivo.is_open()) {
-        guardarNodoEnArchivo(raiz, archivo);
-        archivo.close();
-        cout << "Árbol R guardado en disco en formato binario." << endl;
-    } else {
-        cerr << "No se pudo abrir el archivo binario para guardar el árbol R." << endl;
+// Función para guardar el R-tree en un archivo binario
+void saveRTree(Node* root, const string& filename) {
+    ofstream file(filename, ios::out | ios::binary);
+    if (!file.is_open()) {
+        cerr << "Error al abrir el archivo para escritura." << endl;
+        return;
     }
+
+    // Aquí deberías serializar la estructura del árbol y escribirla en el archivo binario
+
+    file.close();
+}
+
+// Función para cargar el R-tree desde un archivo binario
+Node* loadRTree(const string& filename) {
+    ifstream file(filename, ios::in | ios::binary);
+    if (!file.is_open()) {
+        cerr << "Error al abrir el archivo para lectura." << endl;
+        return nullptr;
+    }
+
+    Node* root = nullptr;
+
+    // Aquí deberías deserializar la estructura del árbol desde el archivo binario
+
+    file.close();
+
+    return root;
 }
 
 int main() {
-    // Define tus datos de entrada (rectángulos y valor de "m")
-    vector<Rectangulo> Rectangulos = {
-        {0, 0, 2, 2},
-        {1, 1, 3, 3},
-        {3, 1, 4, 2},
-        {2, 2, 4, 4},
-        // Agrega más rectángulos según tus necesidades
+    vector<Rectangle> rectangles = {
+        Rectangle(1, 2, 3, 4),
+        Rectangle(2, 3, 4, 5),
+        Rectangle(3, 4, 5, 6),
+        Rectangle(4, 5, 6, 7)
     };
 
-    int m = 2;  // Reemplaza con el valor de "m" que desees
+    int M = 2; // Número máximo de hijos por nodo
 
-    // Construir el árbol R
-    Nodo* arbolR = construirArbolR(Rectangulos, m);
+    Node* root = buildRTree(rectangles, M);
+    cout << "a" << endl;
+    saveRTree(root, "rtree.dat");
+    cout << "b" << endl;
+    Node* loadedRoot = loadRTree("rtree.dat");
+    cout << "c" << endl;
+    cout << "d" << endl;
 
-    // Guardar el árbol R en un archivo binario
-    guardarArbolR(arbolR, "arbolR.bin");
+    // Realiza operaciones con el R-tree
 
-    // Realiza las operaciones deseadas con el árbol R
-    // ...
+    deleteNodes(root); // Limpia la memoria al final
+    deleteNodes(loadedRoot);
 
     return 0;
-}
-
-// Función para cargar un nodo desde un archivo binario
-Nodo* cargarNodoDesdeArchivo(ifstream& archivo) {
-    Nodo* nodo = new Nodo;
-
-    // Cargar el MBR del nodo
-    archivo.read(reinterpret_cast<char*>(&nodo->MBR), sizeof(Rectangulo));
-
-    // Cargar el número de rectángulos en el nodo
-    int numRectangulos;
-    archivo.read(reinterpret_cast<char*>(&numRectangulos), sizeof(int));
-
-    // Cargar los rectángulos del nodo
-    for (int i = 0; i < numRectangulos; i++) {
-        Rectangulo rect;
-        archivo.read(reinterpret_cast<char*>(&rect), sizeof(Rectangulo));
-        nodo->Rectangulos.push_back(rect);
-    }
-
-    // Cargar el número de hijos
-    int numHijos;
-    archivo.read(reinterpret_cast<char*>(&numHijos), sizeof(int));
-
-    // Cargar los hijos
-    for (int i = 0; i < numHijos; i++) {
-        Nodo* hijo = cargarNodoDesdeArchivo(archivo);
-        nodo->Hijos.push_back(hijo);
-    }
-
-    return nodo;
-}
-
-// Función para cargar el árbol R desde un archivo binario
-Nodo* cargarArbolRDesdeArchivo(const string& nombreArchivo) {
-    ifstream archivo(nombreArchivo, ios::binary);
-    if (archivo.is_open()) {
-        Nodo* raiz = cargarNodoDesdeArchivo(archivo);
-        archivo.close();
-        cout << "Árbol R cargado desde el archivo binario." << endl;
-        return raiz;
-    } else {
-        cerr << "No se pudo abrir el archivo binario para cargar el árbol R." << endl;
-        return nullptr;
-    }
 }

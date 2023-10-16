@@ -58,7 +58,6 @@ vector<Nodo>&nearest_recursivo(vector<Nodo>&nodos,int m){
 
 // m cantidad maxima de hijos por nodo
 int nearestx(vector<Rectangulo>&Rectangulos,int m){
-
     sort(Rectangulos.begin(), Rectangulos.end(), [](const Rectangulo& a, const Rectangulo& b) {
         return (a.x1 + a.x2) / 2 < (b.x1 + b.x2) / 2;
     });
@@ -88,7 +87,7 @@ int nearestx(vector<Rectangulo>&Rectangulos,int m){
         Nodo hoja = {mbr,*rec,*nulo};
         Nodos->push_back(hoja);
     }
-    nearest_recursivo(*Nodos,m).size();
+    nearest_recursivo(*Nodos,m);
     return 0;
 } 
 
