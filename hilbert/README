@@ -1,0 +1,7 @@
+# Copile
+g++ GenerateRTreeHilbert.cpp -o RTreeGenerate.exe
+g++ BusquedaRTreeHilbert.cpp -o RTreeSearch.exe
+
+For init this sucess event, you must eject RTreeGenerate.exe
+this code create in memory the R-Tree, what it's init in R_tree_raiz.txt (you can this in file "./Data")
+when you want init searching, you have set BusquedaRTreeHilbert.cpp for set parameters 
