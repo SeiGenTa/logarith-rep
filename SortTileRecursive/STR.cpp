@@ -41,8 +41,8 @@ std::vector<std::vector<T>> dividirEnNPartes(const std::vector<T>& lista, size_t
     return resultado;
 }
 
-bool crearSTR( vector<Rectangulo> rectangulos, int n , char nombre[20], int max) {
 
+bool crearSTR( vector<Rectangulo> rectangulos, int n , char nombre[20], int max){
     if(n % 2 == 0)
     sort(rectangulos.begin(), rectangulos.end(), [](const Rectangulo& izq, const Rectangulo& der) {
         return (izq.x1 + izq.x2) / 2 < (der.x1 + der.x2) / 2;
@@ -60,19 +60,16 @@ bool crearSTR( vector<Rectangulo> rectangulos, int n , char nombre[20], int max)
     }
 
     if(rectangulos.size() <= max){
-        archivo << "leaf \t 1 \n" ;
+        archivo << "1\n" ;
         for(int i = 0; i < rectangulos.size();i++){
-            archivo << 
-            (rectangulos[i].x1 + rectangulos[i].x2)/2 << "\t" <<
-            (rectangulos[i].y1 + rectangulos[i].y2)/2 << "\t" <<
-            rectangulos[i].x1 << "\t" << rectangulos[i].y1 << "\t" << rectangulos[i].x2 << "\t" << rectangulos[i].y2 << endl;
+            archivo << rectangulos[i].x1 << "\t" << rectangulos[i].y1 << "\t" << rectangulos[i].x2 << "\t" << rectangulos[i].y2 << endl;
         } 
         archivo.close();
         return true;
     }
-
-    archivo << "leaf \t 0 \n" ;
+    archivo << "0\n" ;
     vector<vector<Rectangulo>> partes = dividirEnNPartes(rectangulos, max);
+
     for(int i = 0; i < partes.size(); i++){
 
         char nombreHijo[7];
@@ -84,23 +81,35 @@ bool crearSTR( vector<Rectangulo> rectangulos, int n , char nombre[20], int max)
         strcat(direccion, nombreHijo);
         strcat(direccion, ".txt");
 
-        if(n % 2 == 0)
-        archivo << "\t" << (partes[i][0].x1 + partes[i][0].x2) / 2 << "\t" <<
-        (partes[i][partes.size()-1].x1 + partes[i][partes.size()-1].x2) / 2 << "\t" <<
-         direccion << endl;
-        
-        else
-        archivo << "\t" << (partes[i][0].y1 + partes[i][0].y2) / 2 << "\t" <<
-        (partes[i][partes.size()-1].y1 + partes[i][partes.size()-1].y2) / 2 << "\t" <<
-         direccion << endl;
+        int  x1 ,y1 ,x2, y2;
+        for (int j = 0; j < partes[i].size(); j++){
+            if (j == 0){
+                x1 = partes[i][j].x1;
+                y1 = partes[i][j].y1;
+                x2 = partes[i][j].x2;
+                y2 = partes[i][j].y2;
+            }
+            else{
+                if (x1 > partes[i][j].x1){
+                    x1 = partes[i][j].x1;
+                }if (y1 > partes[i][j].y1){
+                    y1 = partes[i][j].y1;
+                }if (x2 < partes[i][j].x2){
+                    x2 = partes[i][j].x2;
+                }if (y2 < partes[i][j].y2){
+                    y2 = partes[i][j].y2;
+                }
+            }
+        }
+
+        archivo << x1 << "\t" << y1 << "\t" << x2 << "\t" << y2 << "\t" << direccion << endl;
 
         crearSTR(partes[i], n+1, direccion, max);
         
     }
-
     archivo.close();
     return true;
-}
+};
 
 int main(){
 
@@ -169,7 +178,7 @@ int main(){
     };
 
     char txt[20] = "./data/raiz.txt";
-    int tamanho_max = 4;
+    int tamanho_max = 8;
 
     crearSTR(rectangulos, 0, txt, tamanho_max);
 

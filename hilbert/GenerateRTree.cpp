@@ -111,7 +111,6 @@ std::vector<std::vector<T>> dividirEnNPartes(const std::vector<T>& lista, size_t
     std::vector<std::vector<T>> resultado(n);
     size_t elementosPorParte = lista.size() / n;
     size_t elementosExtras = lista.size() % n;
-
     size_t indice = 0;
     for (size_t i = 0; i < n; i++) {
         size_t longitudParte = elementosPorParte + (i < elementosExtras ? 1 : 0);
@@ -122,40 +121,62 @@ std::vector<std::vector<T>> dividirEnNPartes(const std::vector<T>& lista, size_t
     return resultado;
 }
 
-void RTreeInmersion(vector<infoDir> info, char name[],int maxSizeOfData){
+
+
+void RTreeInmersion(vector<Rectangle> info, char name[],int maxSizeOfData){
+    int infoSize = info.size();
     ofstream archivo(name);
 
     if (!archivo.is_open()) {
-        cout << "ERROR: can't open the direction: " << name << endl;
-        return ;
-    }
-
-    archivo << "leaf: \t 0" << endl;
-    archivo << "limite superior: \t" << info[info.size() - 1].valueMax << endl;
-    archivo << "limite inferior: \t" << info[0].valueMin << endl;
-    archivo << "V_min\tV_max\tdir" << endl;
-
-    if (info.size() <= maxSizeOfData){
-
-        for(int i = 0; i < info.size(); i++){
-            archivo << info[i].valueMin << "\t" << info[i].valueMax << "\t" << info[i].nameUbq << "\t" << endl;
+            cout << "ERROR: can't open the direction: " << name << endl;
+            return ;
+        }
+    if (infoSize < maxSizeOfData){
+        archivo << "1" << endl;
+        for (int i = 0; i < infoSize; i++){
+            archivo << info[i].x1 << "\t"; 
+            archivo << info[i].y1 << "\t";
+            archivo << info[i].x2 << "\t";
+            archivo << info[i].y2 << "\t" << endl;
         }
         archivo.close();
         return;
     }
 
-    vector<vector<infoDir>> parts = dividirEnNPartes(info, maxSizeOfData);
+    archivo << "0" << endl;
+
+    vector<vector<Rectangle>> parts = dividirEnNPartes(info,maxSizeOfData);
     for (int i = 0; i < parts.size(); i++){
         generarNombreAleatorio(name,10);
         char ubq[23];
         strcpy(ubq, "./Data/");
         strcat(ubq, name);
         strcat(ubq, ".txt");
-        archivo << parts[i][0].valueMin << "\t" << parts[i][parts[i].size() - 1].valueMax << "\t" << ubq << "\t" << endl;
-        RTreeInmersion(parts[i], ubq, maxSizeOfData);
+        int  x1 ,y1 ,x2, y2;
+        for (int j = 0; j < parts[i].size(); j++){
+            if (j == 0){
+                x1 = parts[i][j].x1;
+                y1 = parts[i][j].y1;
+                x2 = parts[i][j].x2;
+                y2 = parts[i][j].y2;
+            }
+            else{
+                if (x1 > parts[i][j].x1){
+                    x1 = parts[i][j].x1;
+                }if (y1 > parts[i][j].y1){
+                    y1 = parts[i][j].y1;
+                }if (x2 < parts[i][j].x2){
+                    x2 = parts[i][j].x2;
+                }if (y2 < parts[i][j].y2){
+                    y2 = parts[i][j].y2;
+                }
+            }
+        }
+        archivo << x1 << "\t" << y1 << "\t" << x2 << "\t" << y2 << "\t" << ubq << endl;
+        RTreeInmersion(parts[i],ubq,maxSizeOfData);
     }
-
     archivo.close();
+    return;
 }
 
 
@@ -229,50 +250,9 @@ int main(){
     }
     quickSort(rectangles,0,rectangles.size()-1);
 
-    vector<vector<Rectangle>> myVector;
-    for(int i = 0; i < rectangles.size(); i += maxSizeOfRectangle){
-        vector<Rectangle> thisRectangles;
-        for(int j = i; j < i + maxSizeOfRectangle && j < rectangles.size() ; j++){
-            thisRectangles.push_back(rectangles[j]);
-        }
-        myVector.push_back(thisRectangles);
-    }
-
-    vector<infoDir> infos;
-    
-    for (int i = 0; i < myVector.size(); i++){
-        char name[10];
-        generarNombreAleatorio(name,10);
-        char ubq[23];
-        strcpy(ubq, "./Data/");
-        strcat(ubq, name);
-        strcat(ubq, ".txt");
-        if(debug)
-        cout << "direccion creada: " << ubq << endl;
-        infoDir newInforDir;
-        newInforDir.valueMin = myVector[i][0].getValueCurveHilbert();
-        newInforDir.valueMax = myVector[i][myVector[i].size() - 1].getValueCurveHilbert();
-        strcpy(newInforDir.nameUbq,ubq);
-
-        infos.push_back(newInforDir);
-        ofstream archivo_Rama(ubq);
-        archivo_Rama << "leaf: \t 1" << endl;
-        archivo_Rama << "limite inferior: \t" << myVector[i][0].getValueCurveHilbert() << endl;
-        archivo_Rama << "limite superior: \t" << myVector[i][myVector[i].size() - 1].getValueCurveHilbert() << endl;
-        archivo_Rama << "valueHilbert\tx1\ty1\tx2\ty2" << endl;
-        for (int j = 0; j < myVector[i].size(); j++){
-            archivo_Rama<< myVector[i][j].getValueCurveHilbert() << "\t" << myVector[i][j].x1 << "\t" << myVector[i][j].y1 << "\t"
-                << myVector[i][j].x2 << "\t" << myVector[i][j].y2  << endl;
-        }
-        archivo_Rama.close();
-    }
-    if (debug){
-        for(int i = 0; i < infos.size(); i++){
-        cout << "valor minimo: " << infos[i].valueMin << "\tvalor maximo: " << infos[i].valueMax << "\tdireccion: "  << infos[i].nameUbq << endl;
-        }
-    }
     char name[23] = "./Data/R_Tree_Raiz.txt";
-    RTreeInmersion(infos,name,maxSizeOfRectangle);
+    RTreeInmersion(rectangles, name, maxSizeOfRectangle);
+
     
     return 0;
 }
