@@ -76,6 +76,21 @@ void deleteNodes(Node* root) {
     delete root;
 }
 
+void saveNode(ofstream& file, Node* node) {
+    if (!node) {
+        return;
+    }
+
+    // Serializa la estructura del nodo y escribe en el archivo
+    file.write(reinterpret_cast<char*>(&node->mbr), sizeof(Rectangle));
+    int numChildren = node->children.size();
+    file.write(reinterpret_cast<char*>(&numChildren), sizeof(int));
+    
+    for (Node* child : node->children) {
+        saveNode(file, child);
+    }
+}
+
 // Función para guardar el R-tree en un archivo binario
 void saveRTree(Node* root, const string& filename) {
     ofstream file(filename, ios::out | ios::binary);
@@ -87,6 +102,24 @@ void saveRTree(Node* root, const string& filename) {
     // Aquí deberías serializar la estructura del árbol y escribirla en el archivo binario
 
     file.close();
+}
+
+Node* loadNode(ifstream& file) {
+    Rectangle mbr;
+    file.read(reinterpret_cast<char*>(&mbr), sizeof(Rectangle));
+    int numChildren;
+    file.read(reinterpret_cast<char*>(&numChildren), sizeof(int));
+    
+    Node* node = new Node();
+    node->mbr = mbr;
+    for (int i = 0; i < numChildren; ++i) {
+        Node* child = loadNode(file);
+        node->children.push_back(child);
+        if (child) {
+            child->parent = node;
+        }
+    }
+    return node;
 }
 
 // Función para cargar el R-tree desde un archivo binario
@@ -117,12 +150,11 @@ int main() {
     int M = 2; // Número máximo de hijos por nodo
 
     Node* root = buildRTree(rectangles, M);
-    cout << "a" << endl;
+    cout << "Árbol construido" << endl;
     saveRTree(root, "rtree.bin");
-    cout << "b" << endl;
+    cout << "Árbol guardado en rtree.bin" << endl;
     Node* loadedRoot = loadRTree("rtree.bin");
-    cout << "c" << endl;
-    cout << "d" << endl;
+    cout << "Árbol cargado desde rtree.bin" << endl;
 
     // Realiza operaciones con el R-tree
 
