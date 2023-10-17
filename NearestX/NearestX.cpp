@@ -99,7 +99,8 @@ void saveRTree(Node* root, const string& filename) {
         return;
     }
 
-    // Aquí deberías serializar la estructura del árbol y escribirla en el archivo binario
+    // Llama a la función de serialización para guardar el árbol
+    saveNode(file, root);
 
     file.close();
 }
@@ -122,7 +123,6 @@ Node* loadNode(ifstream& file) {
     return node;
 }
 
-// Función para cargar el R-tree desde un archivo binario
 Node* loadRTree(const string& filename) {
     ifstream file(filename, ios::in | ios::binary);
     if (!file.is_open()) {
@@ -130,9 +130,14 @@ Node* loadRTree(const string& filename) {
         return nullptr;
     }
 
-    Node* root = nullptr;
+    // Comprueba si el archivo está vacío
+    if (file.peek() == ifstream::traits_type::eof()) {
+        cerr << "El archivo está vacío." << endl;
+        file.close();
+        return nullptr;
+    }
 
-    // Aquí deberías deserializar la estructura del árbol desde el archivo binario
+    Node* root = loadNode(file); // Carga el nodo raíz llamando a loadNode
 
     file.close();
 
@@ -150,11 +155,11 @@ int main() {
     int M = 2; // Número máximo de hijos por nodo
 
     Node* root = buildRTree(rectangles, M);
-    cout << "Árbol construido" << endl;
+    cout << "Arbol construido" << endl;
     saveRTree(root, "rtree.bin");
-    cout << "Árbol guardado en rtree.bin" << endl;
+    cout << "Arbol guardado en rtree.bin" << endl;
     Node* loadedRoot = loadRTree("rtree.bin");
-    cout << "Árbol cargado desde rtree.bin" << endl;
+    cout << "Arbol cargado desde rtree.bin" << endl;
 
     // Realiza operaciones con el R-tree
 
