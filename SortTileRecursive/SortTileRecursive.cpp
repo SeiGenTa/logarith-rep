@@ -15,7 +15,7 @@ struct Nodo{
     vector<Nodo*> hijos;
 };
 
-int SortTileRecursive(vector<Nodo> Nodos, int M){
+Nodo SortTileRecursive(vector<Nodo> Nodos, int M){
 
     //Caso base
     if (Nodos.size() <= M) {
@@ -42,8 +42,10 @@ int SortTileRecursive(vector<Nodo> Nodos, int M){
             Padre.hijos.push_back(&nodo);
         }
 
+        cout << "Hijos: " << Padre.hijos[1]->MBR.x1 << endl;
+
         Nodos.push_back(Padre);
-        return 0;
+        return Padre;
     }
 
     //Ordenamos los nodos segun su coordenada X
@@ -104,11 +106,11 @@ int SortTileRecursive(vector<Nodo> Nodos, int M){
     }
 
     SortTileRecursive(*Nodos2, M);
-    return 0;
+
 };
 
 //Esta funcion construye el R-Tree
-int ConstruirRtreeSTR(int M, vector<Rectangulo> rectangulos){
+Nodo* ConstruirRtreeSTR(int M, vector<Rectangulo> rectangulos){
     
     //Ordenando los primeros puntos segun su coordenada X
     sort(rectangulos.begin(), rectangulos.end(), [](const Rectangulo& izq, const Rectangulo& der) {
@@ -164,11 +166,106 @@ int ConstruirRtreeSTR(int M, vector<Rectangulo> rectangulos){
             Nodos->push_back(hoja);
         }
     }
-    SortTileRecursive(*Nodos, M);
-    return 0;
+    
+    Nodo Padre = SortTileRecursive(*Nodos, M);
+    Nodo *pointer = &Padre;
+    return pointer;
+
 };
 
+// Función para eliminar nodos
+void deleteNodes(Nodo* root) {
+    if (!root) {
+        return;
+    }
+    for (Nodo* child : root->hijos) {
+        deleteNodes(child);
+    }
+    delete root;
+}
+
+void saveNode(ofstream& file, Nodo* node) {
+    if (!node) {
+        return;
+    }
+
+    // Serializa la estructura del nodo y escribe en el archivo
+    file.write(reinterpret_cast<char*>(&node->MBR), sizeof(Rectangulo));
+    int numChildren = node->hijos.size();
+    file.write(reinterpret_cast<char*>(&numChildren), sizeof(int));
+    
+    for (Nodo* child : node->hijos) {
+        saveNode(file, child);
+    }
+}
+
+// Función para guardar el R-tree en un archivo binario
+void saveRTree(Nodo* root, const string& filename) {
+    ofstream file(filename, ios::out | ios::binary);
+    if (!file.is_open()) {
+        cerr << "Error al abrir el archivo para escritura." << endl;
+        return;
+    }
+
+    // Aquí deberías serializar la estructura del árbol y escribirla en el archivo binario
+
+    file.close();
+}
+
+Nodo* loadNode(ifstream& file) {
+    Rectangulo MBR;
+    file.read(reinterpret_cast<char*>(&MBR), sizeof(Rectangulo));
+    int numChildren;
+    file.read(reinterpret_cast<char*>(&numChildren), sizeof(int));
+    
+    Nodo* node = new Nodo();
+    node->MBR = MBR;
+    for (int i = 0; i < numChildren; ++i) {
+        Nodo* child = loadNode(file);
+        node->hijos.push_back(child);
+    }
+    return node;
+}
+
+// Función para cargar el R-tree desde un archivo binario
+Nodo* loadRTree(const string& filename) {
+    ifstream file(filename, ios::in | ios::binary);
+    if (!file.is_open()) {
+        cerr << "Error al abrir el archivo para lectura." << endl;
+        return nullptr;
+    }
+
+    Nodo* root = nullptr;
+
+    // Aquí deberías deserializar la estructura del árbol desde el archivo binario
+
+    file.close();
+
+    return root;
+}
+
 int main() {
+
+    vector<Rectangulo> rectangulos = {
+        Rectangulo{1, 2, 3, 4},
+        Rectangulo{2, 3, 4, 5},
+        Rectangulo{3, 4, 5, 6},
+        Rectangulo{4, 5, 6, 7}
+    };
+
+    int M = 2; // Número máximo de hijos por nodo
+
+    Nodo* root = ConstruirRtreeSTR(M, rectangulos);
+    cout << "Árbol construido" << endl;
+    saveRTree(root, "rtree.bin");
+    cout << "Árbol guardado en rtree.bin" << endl;
+    Nodo* loadedRoot = loadRTree("rtree.bin");
+    cout << "Árbol cargado desde rtree.bin" << endl;
+
+    // Realiza operaciones con el R-tree
+
+    deleteNodes(root); // Limpia la memoria al final
+    deleteNodes(loadedRoot);
 
     return 0;
 };
