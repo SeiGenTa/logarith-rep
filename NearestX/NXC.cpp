@@ -79,41 +79,66 @@ std::vector<std::vector<T>> dividirEnNPartes(const std::vector<T>& lista, size_t
     return resultado;
 }
 
-struct dirs{
-    int x_min;
-    int x_max;
-    char direction[]
-}
-
-bool NearsX
-
-bool buildNearsX(vector<Rectangle>& rectangles, char name[], int sizeMax){
+bool buildNearsX(vector<Rectangle> rectangles, char name[], int sizeMax){
     int sizeRectangles = rectangles.size();
-    if(sizeRectangles <= sizeMax){
-        ofstream archivo(name);
+
+    ofstream archivo(name);
         
-        if (!archivo.is_open()) {
-            cout << "ERROR: can't open the direction: " << name << endl;
-            return false;}
+    if (!archivo.is_open()) {
+        cout << "ERROR: can't open the direction: " << name << endl;
+        return false;}
+
+    if(sizeRectangles <= sizeMax){
+
 
         archivo << 1 << endl;
 
         for (int i = 0; i < sizeRectangles; i++){
-            archivo << rectangles[i].getCenter().first << "\t" << rectangles[i].x1 << "\t" << rectangles[i].y1 << "\t"
+            archivo << rectangles[i].x1 << "\t" << rectangles[i].y1 << "\t"
                 << rectangles[i].x2 << "\t" << rectangles[i].y2 << "\t" << endl;
         }
         archivo.close();
         return true;
     }
 
-    ofstream archivo(name);
-    if (!archivo.is_open()) {
-        cout << "ERROR: can't open the direction: " << name << endl;
-    return false;}
     archivo << 0 << endl;
 
-    vector<vector<Rectangle>> divisions = dividirEnNPartes()
+    vector<vector<Rectangle>> divisions = dividirEnNPartes(rectangles, sizeMax);
 
+
+    for (int i = 0; i < divisions.size(); i++){
+        generarNombreAleatorio(name,10);
+        char ubq[23];
+        strcpy(ubq, "./Data/");
+        strcat(ubq, name);
+        strcat(ubq, ".txt");
+        int  x1 ,y1 ,x2, y2;
+        for (int j = 0; j < divisions[i].size(); j++){
+            if (j == 0){
+                x1 = divisions[i][j].x1;
+                y1 = divisions[i][j].y1;
+                x2 = divisions[i][j].x2;
+                y2 = divisions[i][j].y2;
+            }
+            else{
+                if (x1 > divisions[i][j].x1){
+                    x1 = divisions[i][j].x1;
+                }if (y1 > divisions[i][j].y1){
+                    y1 = divisions[i][j].y1;
+                }if (x2 < divisions[i][j].x2){
+                    x2 = divisions[i][j].x2;
+                }if (y2 < divisions[i][j].y2){
+                    y2 = divisions[i][j].y2;
+                }
+            }
+        }
+        archivo << x1 << "\t" << y1 << "\t" << x2 << "\t" << y2 << "\t" << ubq << endl;
+        buildNearsX(divisions[i],ubq, sizeMax);
+    }
+    archivo.close();
+    
+
+    return true;
 }
 
 int main(){
@@ -128,7 +153,7 @@ int main(){
         }
     }
 
-    vector<Rectangle> rectangles = {
+    vector<Rectangle> rectangulos = {
         {4, 4, 6, 6},
         {2, 2, 4, 4},
         {1 ,1 ,5 ,5},
@@ -137,16 +162,59 @@ int main(){
         {80, 10, 92, 41},
         {37, 6, 48, 40},
         {64, 46, 94, 87},
+        {26, 33, 74, 89},
+        {65, 50, 93, 79},
+        {76, 32, 95, 70},
+        {88, 3, 97, 50},
+        {50, 46, 68, 76},
+        {12, 28, 39, 53},
+        {68, 52, 100, 94},
+        {18, 0, 45, 31},
+        {29, 41, 89, 97},
+        {33, 50, 53, 74},
+        {16, 9, 44, 39},
+        {18, 53, 44, 80},
+        {9, 15, 26, 43},
+        {75, 44, 96, 84},
+        {75, 67, 89, 85},
+        {34, 14, 44, 28},
+        {61, 49, 89, 96},
+        {13, 66, 54, 95},
+        {38, 15, 52, 42},
+        {58, 2, 96, 36},
+        {31, 66, 70, 96},
+        {38, 10, 56, 27},
+        {26, 8, 58, 40},
+        {15, 26, 44, 54},
+        {10, 0, 50, 44},
+        {29, 14, 45, 31},
+        {57, 15, 87, 33},
+        {28, 28, 40, 46},
+        {44, 33, 63, 59},
+        {42, 0, 66, 36},
+        {24, 13, 59, 47},
+        {66, 53, 93, 85},
+        {26, 19, 44, 37},
+        {4, 3, 34, 23},
+        {38, 0, 70, 31},
+        {55, 4, 89, 38},
+        {32, 13, 66, 42},
+        {44, 12, 61, 30},
+        {29, 50, 61, 80},
+        {49, 28, 95, 65},
+        {35, 16, 60, 43},
+        {57, 47, 83, 77},
+        {2, 0, 39, 37},
     };
     int m = 4;
-    int n = rectangles.size();
+    int n = rectangulos.size();
 
     //Dejamos ordenado la lista
-    quickSort(rectangles, 0, n - 1);
+    quickSort(rectangulos, 0, n - 1);
 
-    char dir[] = "./Data/raiz.txt";
+    char dir[] = "./Data/raiz_NRX.txt";
 
-    buildNearsX(rectangles, dir, m);
+    buildNearsX(rectangulos, dir, m);
 
     return 0;
 }
