@@ -144,6 +144,45 @@ Node* loadRTree(const string& filename) {
     return root;
 }
 
+void viewBinaryFileDFS(Node* node);
+
+void viewBinaryFile(const string& filename) {
+    ifstream file(filename, ios::in | ios::binary);
+    if (!file.is_open()) {
+        cerr << "Error al abrir el archivo para lectura." << endl;
+        return;
+    }
+
+    Node* root = loadNode(file); // Carga el contenido del archivo
+
+    // Ahora puedes recorrer la estructura del árbol y mostrar los datos como desees
+    // Por ejemplo, podrías realizar un recorrido en profundidad (DFS) para mostrar los nodos y sus datos.
+    // Aquí hay un ejemplo simple que imprime las coordenadas de los rectángulos en cada nodo:
+
+    if (root) {
+        cout << "Contenido del archivo binario:" << endl;
+        viewBinaryFileDFS(root);
+    } else {
+        cout << "El archivo está vacío o no se pudo cargar correctamente." << endl;
+    }
+
+    file.close();
+}
+
+void viewBinaryFileDFS(Node* node) {
+    if (!node) {
+        return;
+    }
+
+    // Imprime el contenido del nodo, o haz lo que desees con los datos
+    cout << "MBR: (" << node->mbr.x1 << ", " << node->mbr.y1 << ", " << node->mbr.x2 << ", " << node->mbr.y2 << ")" << endl;
+
+    // Recorre los hijos
+    for (Node* child : node->children) {
+        viewBinaryFileDFS(child);
+    }
+}
+
 int main() {
     vector<Rectangle> rectangles = {
         Rectangle(1, 2, 3, 4),
@@ -160,6 +199,7 @@ int main() {
     cout << "Arbol guardado en rtree.bin" << endl;
     Node* loadedRoot = loadRTree("rtree.bin");
     cout << "Arbol cargado desde rtree.bin" << endl;
+    viewBinaryFile("rtree.bin");
 
     // Realiza operaciones con el R-tree
 
