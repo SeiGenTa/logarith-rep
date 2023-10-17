@@ -89,9 +89,7 @@ bool buildNearsX(vector<Rectangle> rectangles, char name[], int sizeMax){
         return false;}
 
     if(sizeRectangles <= sizeMax){
-
-
-        archivo << 1 << endl;
+         archivo << 1 << endl;
 
         for (int i = 0; i < sizeRectangles; i++){
             archivo << rectangles[i].x1 << "\t" << rectangles[i].y1 << "\t"
@@ -142,7 +140,6 @@ bool buildNearsX(vector<Rectangle> rectangles, char name[], int sizeMax){
 }
 
 int main(){
-
     bool debug = true;
 
     for (const auto& entry : fs::directory_iterator("./Data")) {
