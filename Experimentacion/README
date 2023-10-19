@@ -3,6 +3,8 @@ g++ BusquedaR-Tree.cpp -o SEARCH1.exe
 g++ GenerateRTree.cpp -o generateHilbert1.exe
 g++ STR.cpp -o generateSTR1.exe
 g++ NXC.cpp -o generateNXC1.exe
+g++ generadorRectangulos.cpp -o gen.out
+./gen.out 10
 ./generateHilbert1.exe
 ./generateSTR1.exe
 ./generateNXC1.exe 
