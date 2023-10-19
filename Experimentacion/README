@@ -1,0 +1,10 @@
+COMANDOS:
+g++ BusquedaR-Tree.cpp -o SEARCH1.exe
+g++ GenerateRTree.cpp -o generateHilbert1.exe
+g++ STR.cpp -o generateSTR1.exe
+g++ NXC.cpp -o generateNXC1.exe
+./generateHilbert1.exe
+./generateSTR1.exe
+./generateNXC1.exe 
+sudo sh -c "echo 1 > /proc/sys/vm/drop_caches"
+./SEARCH1.exe
