@@ -36,13 +36,18 @@ struct Rectangle{
 
 
 int main(){
-    for(int i = 10; i <= 25; i++){
-            vector<Rectangle> rectangulosQ;
+    for(int i = 17; i <= 25; i++){
+        vector<Rectangle> rectangulosQ;
         vector<Rectangle> rectangulosR;
+        cout << "generando los rectangulos \n";
         generateRectangulos(&rectangulosQ,&rectangulosR,i);
+        cout << "generando el arbol STR \n";
         generateSTR(&rectangulosR, true, 80);
+        cout << "generando el arbol NearestX \n";
         generateNearestX(&rectangulosR, true, 80);
+        cout << "generando el arbol de Hilbert \n";
         generateHilbert(&rectangulosR, true, 80);
+        cout << "inicia busqueda \n";
         func(&rectangulosQ,i);
     }
 

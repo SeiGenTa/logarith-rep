@@ -67,12 +67,18 @@ struct Rectangle{
     }
 };
 // Función de partición para QuickSort
-int particion(vector<Rectangle>& arr, int low, int high) {
-    int pivot = arr[high].getValueCurveHilbert();
+int particion(vector<Rectangle>& arr, int low, int high,vector<int64_t> &valorCurva) {
+    if (valorCurva[high] == -1){
+        valorCurva[high] = arr[high].getValueCurveHilbert();
+    }
+    int pivot = valorCurva[high];
     int i = (low - 1);
 
     for (int j = low; j <= high - 1; j++) {
-        if (arr[j].getValueCurveHilbert() < pivot) {
+        if(valorCurva[high] == -1 ){
+            valorCurva[high] = arr[j].getValueCurveHilbert();
+        }
+        if (valorCurva[high] < pivot) {
             i++;
             swap(arr[i], arr[j]);
         }
@@ -81,11 +87,11 @@ int particion(vector<Rectangle>& arr, int low, int high) {
     return (i + 1);
 }
 // Función QuickSort personalizada
-void quickSort(vector<Rectangle>& arr, int low, int high) {
+void quickSort(vector<Rectangle>& arr, int low, int high, vector<int64_t> &valorCurva) {
     if (low < high) {
-        int pi = particion(arr, low, high);
-        quickSort(arr, low, pi - 1);
-        quickSort(arr, pi + 1, high);
+        int pi = particion(arr, low, high,valorCurva);
+        quickSort(arr, low, pi - 1,valorCurva);
+        quickSort(arr, pi + 1, high,valorCurva);
     }
 }
 
@@ -193,7 +199,10 @@ bool generateHilbert(vector<Rectangle>* rectangles, bool erase,int maxSize){
 
 	char name[23] = "./dHil/R_Tree_Raiz.txt";
 
-	quickSort(rectanglesCopy,0,rectanglesCopy.size()-1);
+    cout << "ordenando segun curva de hilbert \n";
+    vector<int64_t> curves(rectanglesCopy.size(),-1);
+	quickSort(rectanglesCopy,0,rectanglesCopy.size()-1,curves);
+    cout << "Construccion \n";
 	RTreeInmersion(rectanglesCopy, name, maxSize);
 
 	return true;

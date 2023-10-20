@@ -210,6 +210,7 @@ int func(vector<Rectangle>* rectangulosQ, int n){
 
     archivo << "valor de n:\t" << n << endl;
     for (int i = 0; i < 100; i++){
+        cout << "busqueda: " << i+1 << " de el n valor: " << n << endl;
         system(comando);
         int indiceAleatorio = std::rand() % rectangles_1.size();
         Rectangle searched = rectangles_1[indiceAleatorio];
@@ -279,6 +280,9 @@ int func(vector<Rectangle>* rectangulosQ, int n){
     archivo << "tiempo promedio 1:\t" << time1 /100.0 << endl;
     archivo << "tiempo promedio 2:\t" << time2 /100.0 << endl;
     archivo << "tiempo promedio 3:\t" << time3 /100.0 << endl;
+    archivo << "archivos promedio 1:\t" << amountFiles1 /100.0 << endl;
+    archivo << "archivos promedio 2:\t" << amountFiles2 /100.0 << endl;
+    archivo << "archivos promedio 3:\t" << amountFiles3 /100.0 << endl;
 
     archivo.close();
     return 1;
