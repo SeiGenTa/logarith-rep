@@ -36,7 +36,7 @@ struct Rectangle{
 
 
 int main(){
-    for(int i = 17; i <= 25; i++){
+    for(int i = 10; i <= 15; i++){
         vector<Rectangle> rectangulosQ;
         vector<Rectangle> rectangulosR;
         cout << "generando los rectangulos \n";
@@ -48,7 +48,7 @@ int main(){
         cout << "generando el arbol de Hilbert \n";
         generateHilbert(&rectangulosR, true, 80);
         cout << "inicia busqueda \n";
-        func(&rectangulosQ,i);
+        func(&rectangulosR,i);
     }
 
     return 1;

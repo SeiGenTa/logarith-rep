@@ -230,8 +230,8 @@ int func(vector<Rectangle>* rectangulosQ, int n){
         archivo << "1\t" << tiempo_transcurrido << "\t" << cantidadLecturas << "\t" << (isFinded? 1: 0) << "\t" <<"{";
         for(int i = 0; i < visited.size(); i++){
             archivo << "{" << visited[i].x1 << ", " << visited[i].y1 << ", " << visited[i].x2 << ", " << visited[i].y2 << "},";
-        }
-        archivo <<  "}\n";
+       }
+       archivo <<  "}\n";
 
         system(comando);
         visited.clear();

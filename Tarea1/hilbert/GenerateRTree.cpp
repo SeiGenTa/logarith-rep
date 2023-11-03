@@ -173,6 +173,17 @@ void RTreeInmersion(vector<Rectangle> info, char name[],int maxSizeOfData){
     return;
 }
 
+bool generate(vector<Rectangles> rectangulo){
+        if (erase){
+        for (const auto& entry : fs::directory_iterator("./Data")) {
+            if (entry.is_regular_file() && entry.path().extension() == ".txt") {
+                fs::remove(entry.path());
+                if(debug)
+                std::cout << "Se ha eliminado: " << entry.path() << std::endl;
+        }
+    }
+}
+
 
 int main(){
     //CONFIGURACION///////////////////////////////////////
