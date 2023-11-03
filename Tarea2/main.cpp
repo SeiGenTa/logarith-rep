@@ -24,14 +24,15 @@ int generateArray(lInt amountData ,vector<lInt> &arrayNumbers ,vector<lInt> &arr
 int main(){
     //----------------------CONFIGURACION----------------//
     int n = 100; // CANTIDAD DE PRUEBAS
-    const char* nameFileResult = "experimentacion.txt"; //Nombre de donde se guardaran los 
+    const char* nameFileResult = "resultados.txt"; //Nombre de donde se guardaran los 
     bool debugMode = true;
     int max2elevated = 64;
+    int sizeArrays = 100000000;
     //----------------------CONFIGURACION----------------//
 
     ofstream archivo(nameFileResult, std::ios::out);
     if (archivo.is_open()) {
-        archivo << "Resultados Quicksort \t Resultados RadixSort \t Valor n en 2^n \t n° prueba \t valor k radixsort" << endl;
+        archivo << "Resultados Quicksort;Resultados RadixSort;Valor n en 2^n;n° prueba;valor k radixsort" << endl;
         archivo.close();
     }
 
@@ -45,15 +46,19 @@ int main(){
         for (int i = 0; i < n; i++){
             vector<lInt> myArray;
             if (debugMode) cout << "Prueba n°: " << i + 1 << endl;
-            generateArray(100000000,arrayNumbers,myArray,debugMode);
+            generateArray(sizeArrays,arrayNumbers,myArray,debugMode);
 
 
             //AQUI DEBEMOS COLOCAR LOS ALGORITMOS//
+            if (debugMode) cout << "Ejecutando quicksort" << endl;
+            vector<lInt> arrayForQuiksort(myArray);
             auto inicio = high_resolution_clock::now();
-            //ALGORITMO 1
+            Initquiksort(arrayForQuiksort);
             auto fin = high_resolution_clock::now();
             auto tiempo_transcurrido1 = duration_cast<chrono::seconds>(fin - inicio).count();
 
+            if (debugMode) cout << "Ejecutando RadixSort" << endl;
+            vector<lInt> arrayForRadixSort(myArray);
             inicio = high_resolution_clock::now();
             //ALGORITMO 2
             fin = high_resolution_clock::now();
@@ -64,7 +69,7 @@ int main(){
                 cout << "a ocurrido un error al momento de abrir el archivo" << endl;
                 return 1;
             }
-            archivo << tiempo_transcurrido1 << "\t" << tiempo_transcurrido2 << "\t" << j << "\t" << i + 1 << endl;
+            archivo << tiempo_transcurrido1 << ";" << tiempo_transcurrido2 << ";" << j << ";" << i + 1 << endl;
             archivo.close();
         }
     }
