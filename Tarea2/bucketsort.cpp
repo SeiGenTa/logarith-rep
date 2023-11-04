@@ -5,7 +5,7 @@
 void bucketSort(std::vector<unsigned long long int>& arr, int k) {
     if (arr.empty()) return;
 
-    unsigned long long int maxValue = *max_element(arr.begin(), arr.end());
+    unsigned long long int maxValue = *std::max_element(arr.begin(), arr.end());
 
     int n = arr.size();
     int numBuckets = 1 << k;  // 2^k buckets
@@ -29,25 +29,28 @@ void bucketSort(std::vector<unsigned long long int>& arr, int k) {
     }
 }
 
-
+void radixSort(std::vector<unsigned long long int>& arr, int maxBits) {
+    for (int k = 1; k <= maxBits; k++) {
+        bucketSort(arr, k);
+        std::cout << "Array after sorting with " << k << " bits: ";
+        for (unsigned long long int num : arr) {
+            std::cout << num << " ";
+        }
+        std::cout << std::endl;
+    }
+}
 
 int main() {
-    vector<unsigned long long int> arr = {9876543210ULL, 1234567890ULL, 5555555555ULL, 9999999999ULL, 1111111111ULL, 7777777777ULL};
-    
-    cout << "Arreglo original: ";
-    for (int i = 0; i < arr.size(); i++) {
-        cout << arr[i] << " ";
-    }
-    cout << endl;
+    std::vector<unsigned long long int> arr = {170, 45, 75, 90, 802, 24, 2, 66, 1, 8};
+    int maxBits = 16; // Definir el número máximo de bits a considerar
 
-    // Aplicar Bucket Sort al arreglo
-    bucketSort(arr);
+    radixSort(arr, maxBits);
 
-    cout << "Arreglo ordenado: ";
-    for (int i = 0; i < arr.size(); i++) {
-        cout << arr[i] << " ";
+    std::cout << "Final sorted array: ";
+    for (unsigned long long int num : arr) {
+        std::cout << num << " ";
     }
-    cout << endl;
+    std::cout << std::endl;
 
     return 0;
 }
