@@ -4,6 +4,7 @@ typedef unsigned long long int lInt;
 using namespace std::chrono;
 
 #include "quicksort.h"
+#include "bucketsort.h"
 
 int generateArray(lInt amountData ,vector<lInt> &arrayNumbers ,vector<lInt> &array, bool debugMode){
     if (debugMode) cout << "Generando el array" << endl;
@@ -20,6 +21,7 @@ int generateArray(lInt amountData ,vector<lInt> &arrayNumbers ,vector<lInt> &arr
 
     return 0; 
 }
+
 
 int main(){
     //----------------------CONFIGURACION----------------//
@@ -40,27 +42,30 @@ int main(){
         lInt maxNum = pow(2,j);
         vector<lInt> arrayNumbers;
         if (debugMode) cout << "Construyendo array inicial" << endl;
-        for (lInt i = 0; i < maxNum; i++) {
+        for (lInt i = 0; i < maxNum; i++) 
             arrayNumbers.push_back(i + 1); // Asignar valores secuenciales al array
-        }
+        
         for (int i = 0; i < n; i++){
             vector<lInt> myArray;
-            if (debugMode) cout << "Prueba n°: " << i + 1 << endl;
-            generateArray(sizeArrays,arrayNumbers,myArray,debugMode);
 
+            generateArray(sizeArrays,arrayNumbers,myArray,debugMode);
+            if (debugMode) cout << "Prueba n°: " << i + 1 << endl
+            << "tamaño de lista: " << myArray.size() << endl;
 
             //AQUI DEBEMOS COLOCAR LOS ALGORITMOS//
             if (debugMode) cout << "Ejecutando quicksort" << endl;
-            vector<lInt> arrayForQuiksort(myArray);
+
             auto inicio = high_resolution_clock::now();
+            vector<lInt> arrayForQuiksort(myArray);
             Initquiksort(arrayForQuiksort);
             auto fin = high_resolution_clock::now();
             auto tiempo_transcurrido1 = duration_cast<chrono::seconds>(fin - inicio).count();
+            
 
             if (debugMode) cout << "Ejecutando RadixSort" << endl;
             vector<lInt> arrayForRadixSort(myArray);
             inicio = high_resolution_clock::now();
-            //ALGORITMO 2
+            bucketSort(arrayForRadixSort);
             fin = high_resolution_clock::now();
             auto tiempo_transcurrido2 = duration_cast<chrono::seconds>(fin - inicio).count();
 
@@ -76,3 +81,4 @@ int main(){
 
     return 0;
 }
+
