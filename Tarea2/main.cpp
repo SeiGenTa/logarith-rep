@@ -26,8 +26,8 @@ int generateArray(lInt amountData ,vector<lInt> &arrayNumbers ,vector<lInt> &arr
 
 void QuicksortTread(vector<lInt> &myArray ,int &delay){
     cout << "Ejecutando quicksort" << endl;
-    auto inicio = high_resolution_clock::now();
     vector<lInt> arrayForQuiksort(myArray);
+    auto inicio = high_resolution_clock::now();
     Initquiksort(arrayForQuiksort);
     auto fin = high_resolution_clock::now();
     delay = duration_cast<chrono::seconds>(fin - inicio).count();
@@ -36,6 +36,7 @@ void QuicksortTread(vector<lInt> &myArray ,int &delay){
 
 std::mutex mtx;
 std::mutex mtxResults;
+int dispMem = 0;
 int hilosCreados = 0;
 
 void RadixTread(vector<lInt> &myArray ,vector<pair<int,int>> &results, int valueK){
@@ -46,29 +47,34 @@ void RadixTread(vector<lInt> &myArray ,vector<pair<int,int>> &results, int value
     auto fin = high_resolution_clock::now();
     int delay = duration_cast<chrono::seconds>(fin - inicio).count();
     cout << "Se termino RadixSort" << endl;
+    lock_guard<mutex> lock(mtxResults);
+    dispMem++;
     pair<int,int> result(delay, valueK);
     results.push_back(result);
+    dispMem--;
+    
+
     hilosCreados--;
 }
 
 
 void crearHilos(vector<lInt> &myArray, int valueK, vector<pair<int,int>> &results) {
-    std::vector<std::thread> hilos;
+    vector<thread> hilos;
 
     for (int i = 1; i <= valueK; ++i) {
-        std::lock_guard<std::mutex> lock(mtx);
+        lock_guard<mutex> lock(mtx);
         if (hilosCreados < 4) {
             cout << "corriendo radix con k = " << i << endl,
             hilosCreados++; // Incrementa el contador de hilos
-            std::thread hilo(RadixTread, ref(myArray), ref(results), ref(i));
-            hilos.push_back(std::move(hilo));
+            thread hilo(RadixTread, ref(myArray), ref(results), ref(i));
+            hilos.push_back(move(hilo));
         } else {
-            std::this_thread::sleep_for(std::chrono::seconds(1)); // Espera si el límite se alcanzó
+            this_thread::sleep_for(chrono::seconds(1)); // Espera si el límite se alcanzó
             i--;
         }
     }
 
-    for (std::thread& hilo : hilos) {
+    for (thread& hilo : hilos) {
         hilo.join();
     }
 }
@@ -76,7 +82,7 @@ void crearHilos(vector<lInt> &myArray, int valueK, vector<pair<int,int>> &result
 
 int main(){
     //----------------------CONFIGURACION----------------//
-    int n = 10; // CANTIDAD DE PRUEBAS
+    int n = 100; // CANTIDAD DE PRUEBAS
     const char* nameFileResult = "resultados.txt"; //Nombre de donde se guardaran los 
     bool debugMode = true;
     int max2elevated = 64;
@@ -89,7 +95,7 @@ int main(){
         archivo.close();
     }
 
-    for (int j = 20; j < max2elevated + 1; j++){
+    for (int j = 1; j < max2elevated + 1; j++){
         lInt maxNum = pow(2,j);
         vector<lInt> arrayNumbers;
         int valueK = log2(maxNum);
