@@ -105,23 +105,30 @@ int main(){
 
         //BUSQUEDA DEL K OPTIMO
         cout << "buscando K optimo" << endl;
-        vector<lInt> myArray;
-        generateArray(sizeArrays,arrayNumbers,myArray,debugMode);
-        vector<pair<int,int>> results;
-        crearHilos(myArray,valueK,results);
+
 
         int kOpti;
         int time;
-        for(int i = 0; i < results.size(); i++){
-            if(i == 0){
-                kOpti = results[i].second;
-                time = results[i].first;
+        if (j != 1){
+            vector<lInt> myArray;
+            generateArray(sizeArrays,arrayNumbers,myArray,debugMode);
+            vector<pair<int,int>> results;
+            crearHilos(myArray,valueK,results);
+
+            for(int i = 0; i < results.size(); i++){
+                if(i == 0){
+                    kOpti = results[i].second;
+                    time = results[i].first;
+                }
+                else if (results[i].second < time){
+                    kOpti = results[i].second;
+                    time = results[i].first;
+                }
             }
-            else if (results[i].second < time){
-                kOpti = results[i].second;
-                time = results[i].first;
-            }
+        }else{
+            kOpti = 1;
         }
+
 
         cout << "K optimo es: " << kOpti << endl;
         for (int i = 0; i < n; i++){
