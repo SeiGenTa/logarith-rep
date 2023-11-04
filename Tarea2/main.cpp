@@ -41,6 +41,7 @@ int main(){
     for (int j = 1; j < max2elevated + 1; j++){
         lInt maxNum = pow(2,j);
         vector<lInt> arrayNumbers;
+        int valueK = log2(maxNum);
         if (debugMode) cout << "Construyendo array inicial" << endl;
         for (lInt i = 0; i < maxNum; i++) 
             arrayNumbers.push_back(i + 1); // Asignar valores secuenciales al array
@@ -50,7 +51,8 @@ int main(){
 
             generateArray(sizeArrays,arrayNumbers,myArray,debugMode);
             if (debugMode) cout << "Prueba n°: " << i + 1 << endl
-            << "tamaño de lista: " << myArray.size() << endl;
+            << "tamaño de lista: " << myArray.size() << endl
+            << "valor de K: "<< valueK << endl;
 
             //AQUI DEBEMOS COLOCAR LOS ALGORITMOS//
             if (debugMode) cout << "Ejecutando quicksort" << endl;
@@ -65,7 +67,7 @@ int main(){
             if (debugMode) cout << "Ejecutando RadixSort" << endl;
             vector<lInt> arrayForRadixSort(myArray);
             inicio = high_resolution_clock::now();
-            radixSort(arrayForRadixSort,maxNum);
+            radixSort(arrayForRadixSort,valueK);
             fin = high_resolution_clock::now();
             auto tiempo_transcurrido2 = duration_cast<chrono::seconds>(fin - inicio).count();
 
@@ -74,7 +76,7 @@ int main(){
                 cout << "a ocurrido un error al momento de abrir el archivo" << endl;
                 return 1;
             }
-            archivo << tiempo_transcurrido1 << ";" << tiempo_transcurrido2 << ";" << j << ";" << i + 1 << endl;
+            archivo << tiempo_transcurrido1 << ";" << tiempo_transcurrido2 << ";" << j << ";" << i + 1 << ";" << valueK << endl;
             archivo.close();
         }
     }

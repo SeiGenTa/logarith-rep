@@ -1,6 +1,6 @@
 # Tarea 2
 ## Copilacion
 Para copilar deben hacer uso del siguiente comando
-    g++ main.cpp quicksort.cpp bucketsort.cpp -o ./a.out
+- g++ main.cpp quicksort.cpp bucketsort.cpp -o ./a.out
 Para luego ejecutarlo con lo siguiente
-    ./a.out
+- ./a.out
