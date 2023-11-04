@@ -95,7 +95,7 @@ int main(){
         archivo.close();
     }
 
-    for (int j = 4; j < max2elevated + 1; j++){
+    for (int j = 1; j < max2elevated + 1; j++){
         lInt maxNum = pow(2,j);
         vector<lInt> arrayNumbers;
         int valueK = log2(maxNum);
