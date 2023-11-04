@@ -65,7 +65,7 @@ int main(){
             if (debugMode) cout << "Ejecutando RadixSort" << endl;
             vector<lInt> arrayForRadixSort(myArray);
             inicio = high_resolution_clock::now();
-            bucketSort(arrayForRadixSort);
+            radixSort(arrayForRadixSort,maxNum);
             fin = high_resolution_clock::now();
             auto tiempo_transcurrido2 = duration_cast<chrono::seconds>(fin - inicio).count();
 

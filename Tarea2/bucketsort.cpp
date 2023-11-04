@@ -32,25 +32,5 @@ void bucketSort(std::vector<unsigned long long int>& arr, int k) {
 void radixSort(std::vector<unsigned long long int>& arr, int maxBits) {
     for (int k = 1; k <= maxBits; k++) {
         bucketSort(arr, k);
-        std::cout << "Array after sorting with " << k << " bits: ";
-        for (unsigned long long int num : arr) {
-            std::cout << num << " ";
-        }
-        std::cout << std::endl;
     }
-}
-
-int main() {
-    std::vector<unsigned long long int> arr = {170, 45, 75, 90, 802, 24, 2, 66, 1, 8};
-    int maxBits = 16; // Definir el número máximo de bits a considerar
-
-    radixSort(arr, maxBits);
-
-    std::cout << "Final sorted array: ";
-    for (unsigned long long int num : arr) {
-        std::cout << num << " ";
-    }
-    std::cout << std::endl;
-
-    return 0;
 }

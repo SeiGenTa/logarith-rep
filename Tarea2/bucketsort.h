@@ -1,6 +1,6 @@
 #ifndef BUCKETSORT_H
 #define BUCKETSORT_H
 
-void bucketSort(vector<lInt>& arr);
+void radixSort(std::vector<unsigned long long int>& arr, int maxBits);
 
 #endif
