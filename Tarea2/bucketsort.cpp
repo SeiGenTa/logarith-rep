@@ -30,7 +30,5 @@ void bucketSort(std::vector<unsigned long long int>& arr, int k) {
 }
 
 void radixSort(std::vector<unsigned long long int>& arr, int maxBits) {
-    for (int k = 1; k <= maxBits; k++) {
-        bucketSort(arr, k);
-    }
+    bucketSort(arr, maxBits);
 }

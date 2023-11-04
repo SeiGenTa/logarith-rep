@@ -1,6 +1,6 @@
 # Tarea 2
 ## Copilacion
 Para copilar deben hacer uso del siguiente comando
-- g++ main.cpp quicksort.cpp bucketsort.cpp -o ./a.out
+- g++ -std=c++11 main.cpp quicksort.cpp bucketsort.cpp -o ./a.out lpthread
 Para luego ejecutarlo con lo siguiente
 - ./a.out

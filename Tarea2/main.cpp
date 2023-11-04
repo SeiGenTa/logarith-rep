@@ -1,4 +1,6 @@
 #include<bits/stdc++.h>
+#include <thread>
+#include <mutex>
 using namespace std;
 typedef unsigned long long int lInt;
 using namespace std::chrono;
@@ -22,10 +24,59 @@ int generateArray(lInt amountData ,vector<lInt> &arrayNumbers ,vector<lInt> &arr
     return 0; 
 }
 
+void QuicksortTread(vector<lInt> &myArray ,int &delay){
+    cout << "Ejecutando quicksort" << endl;
+    auto inicio = high_resolution_clock::now();
+    vector<lInt> arrayForQuiksort(myArray);
+    Initquiksort(arrayForQuiksort);
+    auto fin = high_resolution_clock::now();
+    delay = duration_cast<chrono::seconds>(fin - inicio).count();
+    cout << "Se termino Quicksort" << endl;
+}
+
+std::mutex mtx;
+std::mutex mtxResults;
+int hilosCreados = 0;
+
+void RadixTread(vector<lInt> &myArray ,vector<pair<int,int>> &results, int valueK){
+    cout << "Ejecutando RadixSort" << endl;
+    vector<lInt> arrayForRadixSort(myArray);
+    auto inicio = high_resolution_clock::now();
+    radixSort(arrayForRadixSort,valueK);
+    auto fin = high_resolution_clock::now();
+    int delay = duration_cast<chrono::seconds>(fin - inicio).count();
+    cout << "Se termino RadixSort" << endl;
+    pair<int,int> result(delay, valueK);
+    results.push_back(result);
+    hilosCreados--;
+}
+
+
+void crearHilos(vector<lInt> &myArray, int valueK, vector<pair<int,int>> &results) {
+    std::vector<std::thread> hilos;
+
+    for (int i = 1; i <= valueK; ++i) {
+        std::lock_guard<std::mutex> lock(mtx);
+        if (hilosCreados < 4) {
+            cout << "corriendo radix con k = " << i << endl,
+            hilosCreados++; // Incrementa el contador de hilos
+            std::thread hilo(RadixTread, ref(myArray), ref(results), ref(i));
+            hilos.push_back(std::move(hilo));
+        } else {
+            std::this_thread::sleep_for(std::chrono::seconds(1)); // Espera si el límite se alcanzó
+            i--;
+        }
+    }
+
+    for (std::thread& hilo : hilos) {
+        hilo.join();
+    }
+}
+
 
 int main(){
     //----------------------CONFIGURACION----------------//
-    int n = 100; // CANTIDAD DE PRUEBAS
+    int n = 10; // CANTIDAD DE PRUEBAS
     const char* nameFileResult = "resultados.txt"; //Nombre de donde se guardaran los 
     bool debugMode = true;
     int max2elevated = 64;
@@ -34,11 +85,11 @@ int main(){
 
     ofstream archivo(nameFileResult, std::ios::out);
     if (archivo.is_open()) {
-        archivo << "Resultados Quicksort;Resultados RadixSort;Valor n en 2^n;n° prueba;valor k radixsort" << endl;
+        archivo << "tipo de trabajo;Resultados;Valor n en 2^n;n° prueba;valor k radixsort" << endl;
         archivo.close();
     }
 
-    for (int j = 1; j < max2elevated + 1; j++){
+    for (int j = 20; j < max2elevated + 1; j++){
         lInt maxNum = pow(2,j);
         vector<lInt> arrayNumbers;
         int valueK = log2(maxNum);
@@ -55,28 +106,24 @@ int main(){
             << "valor de K: "<< valueK << endl;
 
             //AQUI DEBEMOS COLOCAR LOS ALGORITMOS//
-            if (debugMode) cout << "Ejecutando quicksort" << endl;
-
-            auto inicio = high_resolution_clock::now();
-            vector<lInt> arrayForQuiksort(myArray);
-            Initquiksort(arrayForQuiksort);
-            auto fin = high_resolution_clock::now();
-            auto tiempo_transcurrido1 = duration_cast<chrono::seconds>(fin - inicio).count();
             
 
-            if (debugMode) cout << "Ejecutando RadixSort" << endl;
-            vector<lInt> arrayForRadixSort(myArray);
-            inicio = high_resolution_clock::now();
-            radixSort(arrayForRadixSort,valueK);
-            fin = high_resolution_clock::now();
-            auto tiempo_transcurrido2 = duration_cast<chrono::seconds>(fin - inicio).count();
+            int tiempo_transcurrido1;
+            thread miHilo(QuicksortTread, ref(myArray), ref(tiempo_transcurrido1));
+            vector<pair<int,int>> results;
+            crearHilos(myArray,valueK,results);
+
+            miHilo.join();
 
             ofstream archivo(nameFileResult, std::ios::app);
             if (!archivo.is_open()){
                 cout << "a ocurrido un error al momento de abrir el archivo" << endl;
                 return 1;
             }
-            archivo << tiempo_transcurrido1 << ";" << tiempo_transcurrido2 << ";" << j << ";" << i + 1 << ";" << valueK << endl;
+            archivo << "Quicksort" << ";" << tiempo_transcurrido1 << ";" << j << ";" << i << ";" << "null" << endl;
+            for (pair<int,int> data: results){
+                archivo << "RadixSort" << ";" << data.first << ";" << j << ";" << i << ";" << data.second << endl;
+            }
             archivo.close();
         }
     }
