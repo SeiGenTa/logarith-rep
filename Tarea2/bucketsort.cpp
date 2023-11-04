@@ -2,16 +2,17 @@
 #include <vector>
 #include <algorithm>
 using namespace std;
+typedef unsigned long long int lInt;
 
-void bucketSort(vector<unsigned long long int>& arr) {
+void bucketSort(vector<lInt>& arr) {
     if (arr.empty()) return;
 
-    unsigned long long int maxValue = *max_element(arr.begin(), arr.end());
+    lInt maxValue = *max_element(arr.begin(), arr.end());
 
     // Crear "buckets" (contenedores)
     int n = arr.size();
     const int numBuckets = 10;  // número de buckets
-    vector<vector<unsigned long long int>> buckets(numBuckets);
+    vector<vector<lInt>> buckets(numBuckets);
 
     // Distribuir los elementos en los buckets
     for (int i = 0; i < n; i++) {
@@ -33,27 +34,4 @@ void bucketSort(vector<unsigned long long int>& arr) {
             arr[index++] = buckets[i][j];
         }
     }
-}
-
-
-
-int main() {
-    vector<unsigned long long int> arr = {9876543210ULL, 1234567890ULL, 5555555555ULL, 9999999999ULL, 1111111111ULL, 7777777777ULL};
-    
-    cout << "Arreglo original: ";
-    for (int i = 0; i < arr.size(); i++) {
-        cout << arr[i] << " ";
-    }
-    cout << endl;
-
-    // Aplicar Bucket Sort al arreglo
-    bucketSort(arr);
-
-    cout << "Arreglo ordenado: ";
-    for (int i = 0; i < arr.size(); i++) {
-        cout << arr[i] << " ";
-    }
-    cout << endl;
-
-    return 0;
 }
