@@ -47,11 +47,8 @@ void RadixTread(vector<lInt> &myArray ,vector<pair<int,int>> &results, int value
     auto fin = high_resolution_clock::now();
     int delay = duration_cast<chrono::seconds>(fin - inicio).count();
     cout << "Se termino RadixSort" << endl;
-    lock_guard<mutex> lock(mtxResults);
-    dispMem++;
     pair<int,int> result(delay, valueK);
     results.push_back(result);
-    dispMem--;
     
 
     hilosCreados--;
@@ -63,7 +60,7 @@ void crearHilos(vector<lInt> &myArray, int valueK, vector<pair<int,int>> &result
 
     for (int i = 1; i <= valueK; ++i) {
         lock_guard<mutex> lock(mtx);
-        if (hilosCreados < 5) {
+        if (hilosCreados < 4) {
             cout << "corriendo radix con k = " << i << endl,
             hilosCreados++; // Incrementa el contador de hilos
             thread hilo(RadixTread, ref(myArray), ref(results), i);
@@ -95,7 +92,7 @@ int main(){
         archivo.close();
     }
 
-    for (int j = 1; j < max2elevated + 1; j++){
+    for (int j = 10; j < max2elevated + 1; j++){
         lInt maxNum = pow(2,j);
         vector<lInt> arrayNumbers;
         int valueK = log2(maxNum);
@@ -104,6 +101,7 @@ int main(){
             arrayNumbers.push_back(i + 1); // Asignar valores secuenciales al array
 
         //BUSQUEDA DEL K OPTIMO
+        hilosCreados = 0;
         cout << "buscando K optimo" << endl;
 
 
