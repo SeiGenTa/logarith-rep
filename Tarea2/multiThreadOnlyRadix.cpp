@@ -96,7 +96,7 @@ int main() {
         archivo.close();
     }
 
-    for (int j = 7; j < max2elevated + 1; j++) {
+    for (int j = 21; j < max2elevated + 1; j++) {
         lInt maxNum = pow(2, j);
         int valueK = j;
         int kOpti;
@@ -107,8 +107,8 @@ int main() {
             vector<pair<int, int>> results;
             crearHilos(myArray, valueK, results);
 
-            myArray.clear();
             for (int i = 0; i < results.size(); i++) {
+                cout << "valor K: " << results[i].second << "tardo: " << results[i].first << endl;
                 if (i == 0) {
                     kOpti = results[i].second;
                     time = results[i].first;
@@ -141,11 +141,14 @@ int main() {
                 if (debugMode) cout << "Prueba n°: " << t << endl
                 << "tamaño de lista: " << myArray.size() << endl
                 << "valor de K: "<< kOpti << endl;
-                int tiempo_transcurrido1;
-                thread miHilo(QuicksortTread, ref(myArray), ref(tiempo_transcurrido1));
+
+                //int tiempo_transcurrido1;
+                //thread miHilo(QuicksortTread, ref(myArray), ref(tiempo_transcurrido1));
+
                 vector<pair<int,int>> results;
                 thread hilo(RadixTread, ref(myArray), ref(results), kOpti, false);
-                miHilo.join();
+                
+                //miHilo.join();
                 hilo.join();
 
                 //lock_guard<mutex> lockResults(mtxResults);
@@ -154,7 +157,7 @@ int main() {
                     cout << "Ha ocurrido un error al momento de abrir el archivo" << endl;
                 }
                 else {
-                    archivo << tiempo_transcurrido1 << ";" << results[0].first << ";" << j << ";" << t << ";" << results[0].second << endl;
+                    archivo << "None" << ";" << results[0].first << ";" << j << ";" << t << ";" << results[0].second << endl;
                     archivo.close();
                 }
                 hilosCreados--;
