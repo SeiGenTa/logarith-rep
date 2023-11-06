@@ -63,7 +63,7 @@ void crearHilos(vector<lInt> &myArray, int valueK, vector<pair<int,int>> &result
 
     for (int i = 1; i <= valueK; ++i) {
         lock_guard<mutex> lock(mtx);
-        if (hilosCreados < 4) {
+        if (hilosCreados < 2) {
             cout << "corriendo radix con k = " << i << endl,
             hilosCreados++; // Incrementa el contador de hilos
             thread hilo(RadixTread, ref(myArray), ref(results), i,true);
@@ -83,7 +83,7 @@ void crearHilos(vector<lInt> &myArray, int valueK, vector<pair<int,int>> &result
 int main() {
     //--------------CONFIGURACION-------------///
     const int hilosPermitidos = 2; //Cantidad de threads que permite al momento 
-    const int n = 30;
+    const int n = 100;
     const char* nameFileResult = "resultados.txt";
     const bool debugMode = true;
     const int max2elevated = 64;
@@ -96,31 +96,27 @@ int main() {
         archivo.close();
     }
 
-    for (int j = 21; j < max2elevated + 1; j++) {
+    for (int j = 1; j < max2elevated + 1; j++) {
         lInt maxNum = pow(2, j);
-        int valueK = j;
+        int valueK = 26;
         int kOpti;
         int time;
-        if (j != 1) {
-            vector<lInt> myArray;
-            generateArray(sizeArrays, maxNum, myArray, debugMode);
-            vector<pair<int, int>> results;
-            crearHilos(myArray, valueK, results);
 
-            for (int i = 0; i < results.size(); i++) {
-                cout << "valor K: " << results[i].second << "tardo: " << results[i].first << endl;
-                if (i == 0) {
-                    kOpti = results[i].second;
-                    time = results[i].first;
-                }
-                else if (results[i].first < time) {
-                    kOpti = results[i].second;
-                    time = results[i].first;
-                }
-            
+        vector<lInt> myArray;
+        generateArray(sizeArrays, maxNum, myArray, debugMode);
+        vector<pair<int, int>> results;
+        crearHilos(myArray, valueK, results);
+        for (int i = 0; i < results.size(); i++) {
+            cout << "valor K: " << results[i].second << "tardo: " << results[i].first << endl;
+            if (i == 0) {
+                kOpti = results[i].second;
+                time = results[i].first;
             }
-        } else {
-            kOpti = 1;
+            else if (results[i].first < time) {
+                kOpti = results[i].second;
+                time = results[i].first;
+            }
+        
         }
 
         cout << "K optimo es: " << kOpti << endl;

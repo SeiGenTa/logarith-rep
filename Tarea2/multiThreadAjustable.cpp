@@ -87,7 +87,7 @@ int main() {
     const char* nameFileResult = "resultados.txt";
     const bool debugMode = true;
     const int max2elevated = 64;
-    const int sizeArrays = 100000000;
+    const int sizeArrays = 10000000;
     //--------------CONFIGURACION-------------///
 
     ofstream archivo(nameFileResult, std::ios::out);
@@ -98,7 +98,7 @@ int main() {
 
     for (int j = 7; j < max2elevated + 1; j++) {
         lInt maxNum = pow(2, j);
-        int valueK = j;
+        int valueK = 26;
         int kOpti;
         int time;
         if (j != 1) {
