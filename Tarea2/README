@@ -8,3 +8,9 @@ Para luego ejecutarlo con lo siguiente
 ## Para codigo de 4 threads:
 - g++ -std=c++11 mainPrueba.cpp quicksort.cpp bucketsort.cpp -o ./a.out
 Se ejecuta de igual modo, advertencia, registre hasta 7 gbs de uso de memoria
+
+
+## Para codigo de n threads
+Recomiendo probar los valores, en especial hilosPermitidos el cual es el que ajusta la cantidad de hilos que se usaran.
+Asuma que para hilosPermitidos ocupa 7,5 Gb
+- g++ multiThreadAjustable.cpp quicksort.cpp bucketsort.cpp -o ./a.out

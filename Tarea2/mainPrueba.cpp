@@ -76,6 +76,31 @@ void crearHilos(vector<lInt> &myArray, int valueK, vector<pair<int,int>> &result
     }
 }
 
+void analizisData(lInt kOpti ,int j,int sizeArrays,vector<lInt> &arrayNumbers,bool debugMode,int valueK,char* &nameFileResult){
+    for (int i = 0; i < numIteracionesPorHilo + 1; i++){
+        vector<lInt> myArray
+        generateArray(sizeArrays,arrayNumbers,myArray,debugMode);
+        if (debugMode) cout << "Prueba n°: " << i + 67  << endl
+        << "tamaño de lista: " << myArray.size() << endl
+        << "valor de K: "<< valueK << endl;
+        //AQUI DEBEMOS COLOCAR LOS ALGORITMOS/
+        int tiempo_transcurrido1;
+        thread miHilo(QuicksortTread, ref(myArray), ref(tiempo_transcurrido1))
+        vector<pair<int,int>> results;
+        thread hilo(RadixTread, ref(myArray), ref(results), kOpti)
+        miHilo.join();
+        hilo.join()
+        lock_guard<mutex> lock(mtxResults);
+        ofstream archivo(nameFileResult, std::ios::app);
+        if (!archivo.is_open()){
+            cout << "a ocurrido un error al momento de abrir el archivo" << endl;
+            return 1;
+        }
+        archivo << tiempo_transcurrido1 << ";" << results[0].first << ";" << j << ";" << i + 67 << ";" << results[0].second << endl;
+        archivo.close();
+    }
+}
+
 
 int main() {
     int n = 100;
@@ -130,7 +155,7 @@ int main() {
         int tiempo_transcurrido1;
         vector<pair<int, int>> results1;
         vector<lInt> myArray1;
-        thread hilo2([&myArray1, kOpti, numIteracionesPorHilo,j,sizeArrays,&arrayNumbers,debugMode,valueK,&nameFileResult](){
+        thread hilo2([kOpti, numIteracionesPorHilo,j,sizeArrays,&arrayNumbers,debugMode,valueK,&nameFileResult](){
             for (int i = 0; i < numIteracionesPorHilo + 1; i++){
                 vector<lInt> myArray;
 
@@ -161,7 +186,7 @@ int main() {
             return 0;
         });
 
-        thread hilo3([&myArray1, kOpti, numIteracionesPorHilo,j,sizeArrays,&arrayNumbers,debugMode,valueK,&nameFileResult](){
+        thread hilo3([kOpti, numIteracionesPorHilo,j,sizeArrays,&arrayNumbers,debugMode,valueK,&nameFileResult](){
             for (int i = 0; i < numIteracionesPorHilo; i++){
                 vector<lInt> myArray;
 
