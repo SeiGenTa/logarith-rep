@@ -63,7 +63,7 @@ void crearHilos(vector<lInt> &myArray, int valueK, vector<pair<int,int>> &result
 
     for (int i = 1; i <= valueK; ++i) {
         lock_guard<mutex> lock(mtx);
-        if (hilosCreados < 4) {
+        if (hilosCreados < 2) {
             cout << "corriendo radix con k = " << i << endl,
             hilosCreados++; // Incrementa el contador de hilos
             thread hilo(RadixTread, ref(myArray), ref(results), i,true);
@@ -85,9 +85,10 @@ int main() {
     const int hilosPermitidos = 2; //Cantidad de threads que permite al momento 
     const int n = 30;
     const char* nameFileResult = "resultados.txt";
+    const char* nameFileKOpti = "KOpti.txt";
     const bool debugMode = true;
     const int max2elevated = 64;
-    const int sizeArrays = 10000000;
+    const int sizeArrays = 100000000;
     //--------------CONFIGURACION-------------///
 
     ofstream archivo(nameFileResult, std::ios::out);
@@ -96,31 +97,35 @@ int main() {
         archivo.close();
     }
 
-    for (int j = 7; j < max2elevated + 1; j++) {
+    ofstream archivo(nameFileKOpti, std::ios::out);
+    if (archivo.is_open()) {
+        archivo << "Valor K;valor del n del universo;tiempo tardado" << endl;
+        archivo.close();
+    }
+
+    for (int j = 1; j < max2elevated + 1; j++) {
         lInt maxNum = pow(2, j);
         int valueK = 26;
         int kOpti;
         int time;
-        if (j != 1) {
-            vector<lInt> myArray;
-            generateArray(sizeArrays, maxNum, myArray, debugMode);
-            vector<pair<int, int>> results;
-            crearHilos(myArray, valueK, results);
 
-            myArray.clear();
-            for (int i = 0; i < results.size(); i++) {
-                if (i == 0) {
-                    kOpti = results[i].second;
-                    time = results[i].first;
-                }
-                else if (results[i].first < time) {
-                    kOpti = results[i].second;
-                    time = results[i].first;
-                }
-            
+
+        cout << "bucando K optimo" << endl;
+        vector<lInt> myArray;
+        generateArray(sizeArrays, maxNum, myArray, debugMode);
+        vector<pair<int, int>> results;
+        crearHilos(myArray, valueK, results);
+        for (int i = 0; i < results.size(); i++) {
+            cout << "valor K: " << results[i].second << "tardo: " << results[i].first << endl;
+            if (i == 0) {
+                kOpti = results[i].second;
+                time = results[i].first;
             }
-        } else {
-            kOpti = 1;
+            else if (results[i].first < time) {
+                kOpti = results[i].second;
+                time = results[i].first;
+            }
+        
         }
 
         cout << "K optimo es: " << kOpti << endl;

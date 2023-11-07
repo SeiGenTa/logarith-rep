@@ -17,3 +17,10 @@ Asuma que para hilosPermitidos ocupa 7,5 Gb
 
 ## Only RadixSort
 - g++ multiThreadOnlyRadix.cpp quicksort.cpp bucketsort.cpp -o ./a.out
+
+
+## para la version que solo busca el KOptimo:
+### Compilacion:
+- g++ SearchKOptimo.cpp quicksort.cpp bucketsort.cpp -o ./a.out
+### Lanzamiento:
+- ./a.out

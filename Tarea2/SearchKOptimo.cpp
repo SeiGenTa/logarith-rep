@@ -24,17 +24,6 @@ int generateArray(lInt amountData ,lInt maxNum ,vector<lInt> &array, bool debugM
     return 0; 
 }
 
-void QuicksortTread(vector<lInt> &myArray ,int &delay){
-    cout << "Ejecutando quicksort" << endl;
-    vector<lInt> arrayForQuiksort(myArray);
-    auto inicio = high_resolution_clock::now();
-    Initquiksort(arrayForQuiksort);
-    auto fin = high_resolution_clock::now();
-    delay = duration_cast<chrono::seconds>(fin - inicio).count();
-    cout << "Se termino Quicksort" << endl;
-    arrayForQuiksort.clear();
-}
-
 std::mutex mtx;
 std::mutex mtxResults;
 condition_variable cond;
@@ -83,8 +72,8 @@ void crearHilos(vector<lInt> &myArray, int valueK, vector<pair<int,int>> &result
 int main() {
     //--------------CONFIGURACION-------------///
     const int hilosPermitidos = 2; //Cantidad de threads que permite al momento 
-    const int n = 100;
-    const char* nameFileResult = "resultados.txt";
+    const int n = 30;
+    const char* nameFileResult = "KOpti.txt";
     const bool debugMode = true;
     const int max2elevated = 64;
     const int sizeArrays = 100000000;
@@ -92,7 +81,7 @@ int main() {
 
     ofstream archivo(nameFileResult, std::ios::out);
     if (archivo.is_open()) {
-        archivo << "Resultado Quicksort;Resultado RadixSort;Valor n en 2^n;n° prueba;valor k radixsort" << endl;
+        archivo << "Valor K;valor del n del universo;tiempo tardado" << endl;
         archivo.close();
     }
 
@@ -102,6 +91,8 @@ int main() {
         int kOpti;
         int time;
 
+
+        cout << "bucando K optimo" << endl;
         vector<lInt> myArray;
         generateArray(sizeArrays, maxNum, myArray, debugMode);
         vector<pair<int, int>> results;
@@ -129,50 +120,6 @@ int main() {
         cout << "K optimo es: " << kOpti << endl;
 
         vector<thread> hilos;
-
-        for (int i = 1; i <= n; ++i) {
-            unique_lock<mutex> lock(mtx);
-            cond.wait(lock, [&]() { return hilosCreados < hilosPermitidos; });
-
-            hilosCreados++;
-            int t = i;
-
-            lock.unlock();
-            thread hilo([&sizeArrays, &maxNum, &debugMode, &valueK, &nameFileResult, t, &kOpti, &j]() {
-                vector<lInt> myArray;
-                generateArray(sizeArrays,maxNum,myArray,debugMode);
-                if (debugMode) cout << "Prueba n°: " << t << endl
-                << "tamaño de lista: " << myArray.size() << endl
-                << "valor de K: "<< kOpti << endl;
-
-                //int tiempo_transcurrido1;
-                //thread miHilo(QuicksortTread, ref(myArray), ref(tiempo_transcurrido1));
-
-                vector<pair<int,int>> results;
-                thread hilo(RadixTread, ref(myArray), ref(results), kOpti, false);
-                
-                //miHilo.join();
-                hilo.join();
-
-                //lock_guard<mutex> lockResults(mtxResults);
-                ofstream archivo(nameFileResult, ios::app);
-                if (!archivo.is_open()) {
-                    cout << "Ha ocurrido un error al momento de abrir el archivo" << endl;
-                }
-                else {
-                    archivo << "None" << ";" << results[0].first << ";" << j << ";" << t << ";" << results[0].second << endl;
-                    archivo.close();
-                }
-                hilosCreados--;
-                cout << "hilos creados: " << hilosCreados << endl;
-                cond.notify_one();
-                return 0;
-            });
-            hilos.push_back(move(hilo));
-        }
-        for (thread& hilo : hilos) {
-            hilo.join();
-        }
     }
 
     return 0;
