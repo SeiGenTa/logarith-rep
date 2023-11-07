@@ -1,0 +1,17 @@
+Recuerden crear un entorno virtual
+# Instrucciones creacion entorno
+
+0.- sudo apt-get update && sudo apt-get upgrade
+1.- sudo apt install virtualenv
+2.- virtualenv --python=python3 .env
+
+## Activacion
+para activarlo solo debemos hacer el siguiente comando:
+- source .env/bin/activate
+
+Tambien puedes crearlo al abrir el archiv normalizacion.ipynb
+
+# Intalen lo siguiente:
+pandas y matplotlib
+pip install pandas
+pip install matplotlib
