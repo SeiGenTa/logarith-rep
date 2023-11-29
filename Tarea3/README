@@ -1,0 +1,18 @@
+# Tarea 3
+## Compilacion tarea:
+### Divide
+g++ Divide.cpp Point.cpp -o TestDivide.out
+para luego ejecutarlo con
+./TestDivide.out
+
+### Aleatorio
+g++ Random.cpp Point.cpp -o TestRandom.out
+para luego ejecutarlo con
+./TestRandom.out
+
+### funcion main
+g++ main.cpp Random.cpp Point.cpp Divide.cpp -o experimentacion.out
+para ejecutar:
+experimentacion.out
+
+Esta es una version preliminar, solo prueba si estan funcionando como deberia
