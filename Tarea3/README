@@ -11,8 +11,13 @@ para luego ejecutarlo con
 ./TestRandom.out
 
 ### funcion main
-g++ main.cpp Random.cpp Point.cpp Divide.cpp -o experimentacion.out
+g++ main.cpp Random.cpp Point.cpp Sweep.cpp -o experimentacion.out
 para ejecutar:
 experimentacion.out
 
 Esta es una version preliminar, solo prueba si estan funcionando como deberia
+
+### Sweep
+g++ Sweep.cpp Point.cpp -o TestSweep.out
+para luego ejecutarlo con
+./TestSweep.out

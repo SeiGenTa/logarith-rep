@@ -1,67 +1,73 @@
-#include <bits/stdc++.h>
-using namespace std;
- 
-// To find the closest pair of points
-long closestPair(vector<pair<int, int> > coordinates, int n)
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cmath>
+#include <limits>
+
+#include "Point.h"
+
+// Función para calcular la distancia euclidiana entre dos puntos
+double calcularDistancia(const Point &p1, const Point &p2)
 {
-    int i;
-    // Vector pair to store points on plane
-    vector<pair<int, int> > v;
-    for (i = 0; i < n; i++)
-        v.push_back({ coordinates[i].first,
-                      coordinates[i].second });
- 
-    // Sort them according to their
-    // x-coordinates
-    sort(v.begin(), v.end());
- 
-    // Minimum distance b/w points
-    // seen so far
-    long d = INT_MAX;
- 
-    // Keeping the points in
-    // increasing order
-    set<pair<int, int> > st;
-    st.insert({ v[0].first, v[0].second });
- 
-    for (i = 1; i < n; i++) {
-        auto l = st.lower_bound(
-            { v[i].first - d, v[i].second - d });
-        auto r = st.upper_bound(
-            { v[i].first, v[i].second + d });
-        if (l == st.end())
-            continue;
- 
-        for (auto p = l; p != r; p++) {
-            pair<int, int> val = *p;
-            long dis = (v[i].first - val.first)
-                           * (v[i].first - val.first)
-                       + (v[i].second - val.second)
-                             * (v[i].second - val.second);
- 
-            // Updating the minimum
-            // distance dis
-            if (d > dis)
-                d = dis;
-        }
-        st.insert({ v[i].first, v[i].second });
-    }
- 
-    return d;
+    return std::sqrt(std::pow(p2.x - p1.x, 2) + std::pow(p2.y - p1.y, 2));
 }
- 
-// Driver code
-int main()
+
+// Función de comparación para ordenar puntos por coordenada x
+bool compararPorX(const Point &p1, const Point &p2)
 {
- 
-    // Points on a plane P[i] = {x, y}
-    vector<pair<int, int> > P = {
-        { 1, 2 }, { 2, 3 }, { 3, 4 }, { 5, 6 }, { 2, 1 }
-    };
-    int n = P.size();
- 
-    // Function call
-    cout << "The smallest distance is "
-         << closestPair(P, n);
-    return 0;
+    return p1.x < p2.x;
+}
+
+// Función para encontrar el par más cercano utilizando el algoritmo de barrido
+std::pair<Point, Point> encontrarParMasCercanoSweep(const std::vector<Point> &puntos)
+{
+    if (puntos.size() < 2)
+    {
+        // No hay suficientes puntos para encontrar un par cercano
+        return {{0.0, 0.0}, {0.0, 0.0}};
+    }
+
+    // Ordenar los puntos por coordenada x
+    std::vector<Point> puntosOrdenados = puntos;
+    std::sort(puntosOrdenados.begin(), puntosOrdenados.end(), compararPorX);
+
+    // Inicializar la distancia mínima
+    float distanciaMinima = std::numeric_limits<float>::max();
+    std::pair<Point, Point> parMasCercano = {{0.0, 0.0}, {0.0, 0.0}};
+
+    // Índices de los puntos más cercanos en la lista ordenada
+    size_t indicePunto1 = 0;
+    size_t indicePunto2 = 0;
+
+    // Algoritmo de barrido
+    for (size_t i = 0; i < puntosOrdenados.size(); ++i)
+    {
+        for (size_t j = i + 1; j < puntosOrdenados.size() && puntosOrdenados[j].x - puntosOrdenados[i].x < distanciaMinima; ++j)
+        {
+            float distancia = calcularDistancia(puntosOrdenados[i], puntosOrdenados[j]);
+            if (distancia < distanciaMinima)
+            {
+                distanciaMinima = distancia;
+                parMasCercano = {puntosOrdenados[i], puntosOrdenados[j]};
+                indicePunto1 = i;
+                indicePunto2 = j;
+            }
+        }
+    }
+
+    // Verificar si hay puntos más cercanos en la franja central
+    for (size_t i = indicePunto1; i < indicePunto2; ++i)
+    {
+        for (size_t j = i + 1; j < indicePunto2; ++j)
+        {
+            double distancia = calcularDistancia(puntosOrdenados[i], puntosOrdenados[j]);
+            if (distancia < distanciaMinima)
+            {
+                distanciaMinima = distancia;
+                parMasCercano = {puntosOrdenados[i], puntosOrdenados[j]};
+            }
+        }
+    }
+
+    return parMasCercano;
 }
