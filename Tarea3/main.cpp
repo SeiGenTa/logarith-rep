@@ -48,23 +48,23 @@ int threadComplete(vector<Point> points, int n, const std::string &nameFileResul
 {
     vector<Point>
         thisPoints(points);
-    cout << "iniciando sweep" << endl;
-    auto inicio = std::chrono::high_resolution_clock::now();
-    pair<Point, Point> parDeterminite = encontrarParMasCercanoSweep(thisPoints);
-    auto fin = std::chrono::high_resolution_clock::now();
-
-    std::chrono::duration<double> duracion1 = fin - inicio;
+    //cout << "iniciando sweep" << endl;
+    //auto inicio = std::chrono::high_resolution_clock::now();
+    //pair<Point, Point> parDeterminite = encontrarParMasCercanoSweep(thisPoints);
+    //auto fin = std::chrono::high_resolution_clock::now();
+//
+    //std::chrono::duration<double> duracion1 = fin - inicio;
 
     cout << "iniciando random" << endl;
-    inicio = std::chrono::high_resolution_clock::now();
+    auto inicio = std::chrono::high_resolution_clock::now();
     pair<Point, Point> parRandom = closestPairRandom(thisPoints);
-    fin = std::chrono::high_resolution_clock::now();
+    auto fin = std::chrono::high_resolution_clock::now();
 
     std::chrono::duration<double> duracion2 = fin - inicio;
 
-    cout << "distance calculated in determinite: " << distanceBetweenTwoPoints(&parDeterminite.first, &parDeterminite.second)
-         << ", the points is  (" << parDeterminite.second.x << " , " << parDeterminite.second.x << ") (" << parDeterminite.first.x
-         << " , " << parDeterminite.first.x << ") \n";
+    //cout << "distance calculated in determinite: " << distanceBetweenTwoPoints(&parDeterminite.first, &parDeterminite.second)
+    //     << ", the points is  (" << parDeterminite.second.x << " , " << parDeterminite.second.x << ") (" << parDeterminite.first.x
+    //     << " , " << parDeterminite.first.x << ") \n";
 
     cout << "distance calculated in random: " << distanceBetweenTwoPoints(&parRandom.first, &parRandom.second) << ", the points is  ("
          << parRandom.second.x << " , " << parRandom.second.x << ") (" << parRandom.first.x << " , " << parRandom.first.x << ") \n";
@@ -74,8 +74,8 @@ int threadComplete(vector<Point> points, int n, const std::string &nameFileResul
         ofstream archivo(nameFileResult, std::ios::app);
         if (archivo.is_open())
         {
-            archivo << n << "\t" << duracion2.count()
-                    << "\t " << duracion1.count() << endl;
+            archivo << n << "\t" << duracion2.count() << endl;
+                    //<< "\t " << duracion1.count() << endl;
             archivo.close();
         }
         else
@@ -97,7 +97,7 @@ int main()
     srand(time(NULL));
 
     int amountRep = 25;
-    int hilosPermitidos = 3;
+    int hilosPermitidos = 1;
 
     const char *nameFileResult = "resultados.txt";
 

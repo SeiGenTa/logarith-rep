@@ -8,6 +8,31 @@ using namespace std;
 static bool debugMode = false;
 static bool showState = true;
 
+struct MyKey
+{
+    int first;
+    int second;
+
+    bool operator==(const MyKey &other) const
+    {
+        return std::tie(first, second) == std::tie(other.first, other.second);
+    }
+};
+
+namespace std
+{
+    template <>
+    struct hash<MyKey>
+    {
+        std::size_t operator()(const MyKey &k) const
+        {
+            return hash<int>()(k.first) ^ hash<int>()(k.second);
+        }
+    };
+}
+
+typedef unordered_map<pair<int, int>, vector<Point *>> HashGrid;
+
 /*
 calculate the distance between two points
 */
@@ -22,21 +47,15 @@ will return the distance min betweem two point selected randomly, n times
 */
 float distanceRandom(vector<Point> &points, int length, int n, pair<Point, Point> &opti)
 {
-
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<int> dist(0, length - 1);
-
-    int num1 = dist(gen);
-    int num2 = dist(gen);
-
+    int num1 = rand() % length;
+    int num2 = rand() % length;
+    Point *pont1;
+    Point *pont2;
     while (num1 == num2)
     {
-        num2 = dist(gen);
+        num1 = rand() % length;
+        num2 = rand() % length;
     }
-
-    Point *pont1 = &points[num1];
-    Point *pont2 = &points[num2];
 
     float distanceMin = distanceBetweenTwoPoints(&points[num1], &points[num2]);
     if (debugMode)
@@ -72,13 +91,13 @@ float distanceRandom(vector<Point> &points, int length, int n, pair<Point, Point
 };
 
 // build the grids and save
-bool hashUniversal(vector<Point> &points, int &amountPoints, int &gridSize, vector<vector<vector<Point *>>> &grid)
+bool hashUniversal(vector<Point> &points, int &amountPoints, int &gridSize, vector<vector<vector<Point*>>> &grid)
 {
     for (int i = 0; i < amountPoints; i++)
     {
-        Point *point = &points[i];
-        int valX = point->x * gridSize - 1;
-        int valY = point->y * gridSize - 1;
+        Point* point = &points[i];
+        int valX = point->x * gridSize;
+        int valY = point->y * gridSize;
         grid[valX][valY].push_back(point);
     }
     return true;
@@ -136,16 +155,11 @@ bool searchClosestPairInGrid(vector<vector<vector<Point *>>> *grid, pair<Point, 
 }
 
 // Función para mostrar todos los puntos de la matriz con su ubicación
-void MostrarMatrizConPuntos(const std::vector<std::vector<std::vector<Point *>>> &matriz)
-{
-    for (size_t i = 0; i < matriz.size(); ++i)
-    {
-        for (size_t j = 0; j < matriz[i].size(); ++j)
-        {
-            for (size_t k = 0; k < matriz[i][j].size(); ++k)
-            {
-                if (matriz[i][j][k] != nullptr)
-                {
+void MostrarMatrizConPuntos(const std::vector<std::vector<std::vector<Point*>>>& matriz) {
+    for (size_t i = 0; i < matriz.size(); ++i) {
+        for (size_t j = 0; j < matriz[i].size(); ++j) {
+            for (size_t k = 0; k < matriz[i][j].size(); ++k) {
+                if (matriz[i][j][k] != nullptr) {
                     std::cout << "Punto en (" << matriz[i][j][k]->x << "," << matriz[i][j][k]->y << ") ";
                     std::cout << "Ubicado en la matriz en la posición [" << i << "][" << j << "][" << k << "]\n";
                 }
@@ -174,8 +188,6 @@ pair<Point, Point> closestPairRandom(vector<Point> points)
     if (debugMode)
         cout << "value min find: " << d << endl;
 
-    cout << "size of d: " << d << endl;
-
     if (d == 0)
         return thisMin;
 
@@ -189,12 +201,13 @@ pair<Point, Point> closestPairRandom(vector<Point> points)
         amountHeight++;
     };
 
-    vector<vector<vector<Point *>>> matriz(amountHeight, vector<vector<Point *>>(amountHeight));
+   vector<vector<vector<Point*>>> matriz(amountHeight,vector<vector<Point*>>(amountHeight));
+
 
     if (debugMode || showState)
         cout << "building the grid" << endl;
 
-    hashUniversal(points, lengthVPoints, amountHeight, matriz);
+    hashUniversal(points,lengthVPoints,amountHeight,matriz);
 
     MostrarMatrizConPuntos(matriz);
 
