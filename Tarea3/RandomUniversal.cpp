@@ -158,11 +158,10 @@ void MostrarMatrizConPuntos(const std::vector<std::vector<std::vector<Point *>>>
     }
 }
 
-
 /*
 Function that found the pair of points that its distance is the min
 */
-pair<Point, Point> closestPairRandomUniversal(vector<Point> points)
+pair<Point, Point> closestPairRandomUniversal(vector<Point> points, vector<vector<vector<Point *>>> matriz)
 {
     srand(time(NULL));
     int lengthVPoints = points.size();
@@ -185,7 +184,7 @@ pair<Point, Point> closestPairRandomUniversal(vector<Point> points)
         return thisMin;
 
     if (d < 0.0001)
-        d = 0.0001; 
+        d = 0.0001;
 
     int amountHeight = 0;
     double sizeNow = 0;
@@ -199,8 +198,6 @@ pair<Point, Point> closestPairRandomUniversal(vector<Point> points)
 
     cout << "valor de tamaño actual: " << amountHeight << endl;
 
-    vector<vector<vector<Point *>>> matriz(amountHeight, vector<vector<Point *>>(amountHeight));
-
     if (debugMode || showState)
         cout << "building the grid" << endl;
     hashUniversal(points, lengthVPoints, amountHeight, matriz);
@@ -208,8 +205,6 @@ pair<Point, Point> closestPairRandomUniversal(vector<Point> points)
     if (debugMode || showState)
         cout << "searching the min point" << endl;
     searchClosestPairInGridUni(&matriz, &thisMin);
-
-    
 
     return thisMin;
 }

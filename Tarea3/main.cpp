@@ -135,7 +135,9 @@ int main()
         return 1;
     }
 
-    for (int n = 50000000; n <= 50000000; n += 5000000)
+    vector<vector<vector<Point *>>> matriz(16384, vector<vector<Point *>>(16384));
+
+    for (int n = 5000000; n <= 50000000; n += 5000000)
     {
         vector<Point> points;
         for (int i = 0; i < n; ++i)

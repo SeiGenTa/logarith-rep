@@ -63,16 +63,23 @@ double distanceRandomFMR(vector<Point> &points, int length, int n, pair<Point, P
 };
 
 // build the grids and save
-bool hashFMR(vector<Point> &points, int &amountPoints, int &gridSize, vector<vector<vector<Point *>>> &grid)
+bool hashFMR(vector<Point> &points, int &amountPoints, int &l, int &hashSize, vector<vector<vector<Point *>>> &grid)
 {
-    //Aqui debemos programar el FMR
-    //for (int i = 0; i < amountPoints; i++)
-    //{
-    //    Point *point = &points[i];
-    //    int valX = point->x * gridSize - 1;
-    //    int valY = point->y * gridSize - 1;
-    //    grid[valX][valY].push_back(point);
-    //}
+
+    for (int i = 0; i < amountPoints; i++)
+    {
+        Point *point = &points[i];
+        int a = static_cast<int>(point->x * hashSize);
+        int b = static_cast<int>(point->y * hashSize);
+
+        long long resultadoX = static_cast<long long>(a) % hashSize;
+        long long resultadoY = static_cast<long long>(b) % hashSize;
+
+        //    int valX = point->x * gridSize - 1;
+        //    int valY = point->y * gridSize - 1;
+        grid[static_cast<int>(resultadoX)][static_cast<int>(resultadoY)].push_back(point);
+    }
+
     return true;
 };
 
@@ -140,10 +147,38 @@ bool searchClosestPairInGridFMR(vector<vector<vector<Point *>>> *grid, pair<Poin
     return true;
 }
 
+// Function that searches for the value >= than value in the vector
+// Returns the result and modifies the index through a reference
+int searchBinary(const std::vector<int> &vector, int value, int &index)
+{
+    int left = 0;
+    int right = vector.size() - 1;
+    int result = -1;
+    index = -1;
+
+    while (left <= right)
+    {
+        int medio = left + (right - left) / 2;
+
+        if (vector[medio] >= value)
+        {
+            result = vector[medio];
+            index = medio;
+            right = medio - 1;
+        }
+        else
+        {
+            left = medio + 1;
+        }
+    }
+
+    return result;
+}
+
 /*
 Function that found the pair of points that its distance is the min
 */
-pair<Point, Point> closestPairRandomFMR(vector<Point> points)
+pair<Point, Point> closestPairRandomFMR(vector<Point> points, vector<vector<vector<Point *>>> matriz)
 {
     srand(time(NULL));
     int lengthVPoints = points.size();
@@ -166,7 +201,7 @@ pair<Point, Point> closestPairRandomFMR(vector<Point> points)
         return thisMin;
 
     if (d < 0.0001)
-        d = 0.0001; 
+        d = 0.0001;
 
     int amountHeight = 0;
     double sizeNow = 0;
@@ -177,13 +212,17 @@ pair<Point, Point> closestPairRandomFMR(vector<Point> points)
         sizeNow += d;
         amountHeight++;
     };
-    cout << "valor de tamaño actual: " << amountHeight << endl;
 
-    vector<vector<vector<Point *>>> matriz(amountHeight, vector<vector<Point *>>(amountHeight));
+    int l;
+
+    vector<int> powOf2 = {1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384};
+    int sizeGrill = searchBinary(powOf2, amountHeight, l);
+
+    cout << "valor de tamaño actual: " << sizeGrill << endl;
 
     if (debugMode || showState)
         cout << "building the grid" << endl;
-    hashFMR(points, lengthVPoints, amountHeight, matriz);
+    hashFMR(points, lengthVPoints, l, sizeGrill, matriz);
 
     if (debugMode || showState)
         cout << "searching the min point" << endl;
