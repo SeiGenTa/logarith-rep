@@ -181,6 +181,7 @@ pair<Point, Point> closestPairRandomPMersenne(vector<Point> points)
 
     vector<vector<vector<Point *>>> matriz(amountHeight, vector<vector<Point *>>(amountHeight));
 
+
     if (debugMode || showState)
         cout << "building the grid" << endl;
     hashPMersenne(points, lengthVPoints, amountHeight, matriz);
