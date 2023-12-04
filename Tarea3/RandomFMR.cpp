@@ -12,7 +12,7 @@ static bool showState = true;
 will return the distance min betweem two point selected randomly, n times
 (is possible the response not be correct)
 */
-double distanceRandomUniversal(vector<Point> &points, int length, int n, pair<Point, Point> &opti)
+double distanceRandomFMR(vector<Point> &points, int length, int n, pair<Point, Point> &opti)
 {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -63,20 +63,21 @@ double distanceRandomUniversal(vector<Point> &points, int length, int n, pair<Po
 };
 
 // build the grids and save
-bool hashUniversal(vector<Point> &points, int &amountPoints, int &gridSize, vector<vector<vector<Point *>>> &grid)
+bool hashFMR(vector<Point> &points, int &amountPoints, int &gridSize, vector<vector<vector<Point *>>> &grid)
 {
-    for (int i = 0; i < amountPoints; i++)
-    {
-        Point *point = &points[i];
-        int valX = point->x * gridSize - 1;
-        int valY = point->y * gridSize - 1;
-        grid[valX][valY].push_back(point);
-    }
+    //Aqui debemos programar el FMR
+    //for (int i = 0; i < amountPoints; i++)
+    //{
+    //    Point *point = &points[i];
+    //    int valX = point->x * gridSize - 1;
+    //    int valY = point->y * gridSize - 1;
+    //    grid[valX][valY].push_back(point);
+    //}
     return true;
 };
 
 // Function to get points in the specified area
-vector<Point *> &getPointsInAreaUni(vector<vector<vector<Point *>>> *grid, int i, int j, int heightWidthGrid)
+vector<Point *> &getPointsInAreaFMR(vector<vector<vector<Point *>>> *grid, int i, int j, int heightWidthGrid)
 {
     static vector<Point *> pointsInArea; // Static for optimization
 
@@ -101,7 +102,7 @@ vector<Point *> &getPointsInAreaUni(vector<vector<vector<Point *>>> *grid, int i
 }
 
 // Function that found the pair points comparing between points in the nere grids
-bool searchClosestPairInGridUni(vector<vector<vector<Point *>>> *grid, pair<Point, Point> *min)
+bool searchClosestPairInGridFMR(vector<vector<vector<Point *>>> *grid, pair<Point, Point> *min)
 {
     double distanceMin = 1; //
 
@@ -112,7 +113,7 @@ bool searchClosestPairInGridUni(vector<vector<vector<Point *>>> *grid, pair<Poin
     {
         for (int j = 0; j < heightWidthGrid; j += 2)
         {
-            vector<Point *> &pointsInArea = getPointsInAreaUni(grid, i, j, heightWidthGrid);
+            vector<Point *> &pointsInArea = getPointsInAreaFMR(grid, i, j, heightWidthGrid);
 
             // look for the pair point that is closest to each other
             for (int base = 0; base < pointsInArea.size(); base++)
@@ -139,30 +140,10 @@ bool searchClosestPairInGridUni(vector<vector<vector<Point *>>> *grid, pair<Poin
     return true;
 }
 
-// Función para mostrar todos los puntos de la matriz con su ubicación
-void MostrarMatrizConPuntos(const std::vector<std::vector<std::vector<Point *>>> &matriz)
-{
-    for (size_t i = 0; i < matriz.size(); ++i)
-    {
-        for (size_t j = 0; j < matriz[i].size(); ++j)
-        {
-            for (size_t k = 0; k < matriz[i][j].size(); ++k)
-            {
-                if (matriz[i][j][k] != nullptr)
-                {
-                    std::cout << "Punto en (" << matriz[i][j][k]->x << "," << matriz[i][j][k]->y << ") ";
-                    std::cout << "Ubicado en la matriz en la posición [" << i << "][" << j << "][" << k << "]\n";
-                }
-            }
-        }
-    }
-}
-
-
 /*
 Function that found the pair of points that its distance is the min
 */
-pair<Point, Point> closestPairRandomUniversal(vector<Point> points)
+pair<Point, Point> closestPairRandomFMR(vector<Point> points)
 {
     srand(time(NULL));
     int lengthVPoints = points.size();
@@ -175,7 +156,7 @@ pair<Point, Point> closestPairRandomUniversal(vector<Point> points)
         cout << "Searching the min value" << endl;
     ;
 
-    double d = distanceRandomUniversal(points, lengthVPoints, lengthVPoints, thisMin);
+    double d = distanceRandomFMR(points, lengthVPoints, lengthVPoints, thisMin);
     if (debugMode)
         cout << "value min find: " << d << endl;
 
@@ -196,20 +177,17 @@ pair<Point, Point> closestPairRandomUniversal(vector<Point> points)
         sizeNow += d;
         amountHeight++;
     };
-
     cout << "valor de tamaño actual: " << amountHeight << endl;
 
     vector<vector<vector<Point *>>> matriz(amountHeight, vector<vector<Point *>>(amountHeight));
 
     if (debugMode || showState)
         cout << "building the grid" << endl;
-    hashUniversal(points, lengthVPoints, amountHeight, matriz);
+    hashFMR(points, lengthVPoints, amountHeight, matriz);
 
     if (debugMode || showState)
         cout << "searching the min point" << endl;
-    searchClosestPairInGridUni(&matriz, &thisMin);
-
-    
+    searchClosestPairInGridFMR(&matriz, &thisMin);
 
     return thisMin;
 }

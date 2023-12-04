@@ -2,8 +2,10 @@
 #define POINT_H
 
 struct Point {
-    float x, y;
+    double x, y;
 };
+
+double distanceBetweenTwoPoints(const Point *a, const Point *b);
 
 #endif
 

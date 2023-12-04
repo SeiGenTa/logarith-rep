@@ -3,7 +3,9 @@
 #include <mutex>
 #include "Point.h"
 #include "Sweep.h"
-#include "Random.h"
+#include "RandomUniversal.h"
+#include "RandomFMR.h"
+#include "RandomPMersenne.h"
 using namespace std;
 using namespace std::chrono;
 
@@ -23,7 +25,7 @@ std::pair<Point, Point> encontrarParMasCercano(const std::vector<Point> &puntos)
         return {{0.0, 0.0}, {0.0, 0.0}};
     }
 
-    float distanciaMinima = std::numeric_limits<double>::max();
+    double distanciaMinima = std::numeric_limits<double>::max();
     std::pair<Point, Point> parMasCercano = {{0.0, 0.0}, {0.0, 0.0}};
 
     // Iterar sobre todos los pares de puntos y encontrar la distancia mínima
@@ -31,7 +33,7 @@ std::pair<Point, Point> encontrarParMasCercano(const std::vector<Point> &puntos)
     {
         for (size_t j = i + 1; j < puntos.size(); ++j)
         {
-            float distancia = distanceBetweenTwoPoints(&puntos[i], &puntos[j]);
+            double distancia = distanceBetweenTwoPoints(&puntos[i], &puntos[j]);
             if (distancia < distanciaMinima)
             {
                 distanciaMinima = distancia;
@@ -48,34 +50,54 @@ int threadComplete(vector<Point> points, int n, const std::string &nameFileResul
 {
     vector<Point>
         thisPoints(points);
-    //cout << "iniciando sweep" << endl;
-    //auto inicio = std::chrono::high_resolution_clock::now();
-    //pair<Point, Point> parDeterminite = encontrarParMasCercanoSweep(thisPoints);
-    //auto fin = std::chrono::high_resolution_clock::now();
-//
-    //std::chrono::duration<double> duracion1 = fin - inicio;
-
-    cout << "iniciando random" << endl;
+    cout << "iniciando sweep" << endl;
     auto inicio = std::chrono::high_resolution_clock::now();
-    pair<Point, Point> parRandom = closestPairRandom(thisPoints);
+    pair<Point, Point> parDeterminite = encontrarParMasCercanoSweep(thisPoints);
     auto fin = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> duracion1 = fin - inicio;
 
+    cout << "iniciando random Universal" << endl;
+    inicio = std::chrono::high_resolution_clock::now();
+    pair<Point, Point> parRandom = closestPairRandomUniversal(thisPoints);
+    fin = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duracion2 = fin - inicio;
 
-    //cout << "distance calculated in determinite: " << distanceBetweenTwoPoints(&parDeterminite.first, &parDeterminite.second)
-    //     << ", the points is  (" << parDeterminite.second.x << " , " << parDeterminite.second.x << ") (" << parDeterminite.first.x
-    //     << " , " << parDeterminite.first.x << ") \n";
+    cout << "iniciando random FMR" << endl;
+    inicio = std::chrono::high_resolution_clock::now();
+    pair<Point, Point> parRandomFMR = closestPairRandomFMR(thisPoints);
+    fin = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> duracion3 = fin - inicio;
 
-    cout << "distance calculated in random: " << distanceBetweenTwoPoints(&parRandom.first, &parRandom.second) << ", the points is  ("
+    cout << "iniciando random P Mersene" << endl;
+    inicio = std::chrono::high_resolution_clock::now();
+    pair<Point, Point> parRandomPMersenne = closestPairRandomPMersenne(thisPoints);
+    fin = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> duracion4 = fin - inicio;
+
+    cout << "distance calculated in determinite: " << distanceBetweenTwoPoints(&parDeterminite.first, &parDeterminite.second)
+         << ", the points is  (" << parDeterminite.second.x << " , " << parDeterminite.second.x << ") (" << parDeterminite.first.x
+         << " , " << parDeterminite.first.x << ") \n";
+
+    cout << "distance calculated in random universal: " << distanceBetweenTwoPoints(&parRandom.first, &parRandom.second) << ", the points is  ("
          << parRandom.second.x << " , " << parRandom.second.x << ") (" << parRandom.first.x << " , " << parRandom.first.x << ") \n";
+
+    cout << "distance calculated in random FMR: " << distanceBetweenTwoPoints(&parRandomFMR.first, &parRandomFMR.second) << ", the points is  ("
+         << parRandomFMR.second.x << " , " << parRandomFMR.second.x << ") (" << parRandomFMR.first.x << " , " << parRandomFMR.first.x << ") \n";
+
+    cout << "distance calculated in random P Mersene : " << distanceBetweenTwoPoints(&parRandomPMersenne.first, &parRandomPMersenne.second) << ", the points is  ("
+         << parRandomPMersenne.second.x << " , " << parRandomPMersenne.second.x << ") (" << parRandomPMersenne.first.x << " , " << parRandomPMersenne.first.x << ") \n";
 
     {
         lock_guard<mutex> lock(mtxResults);
         ofstream archivo(nameFileResult, std::ios::app);
         if (archivo.is_open())
         {
-            archivo << n << "\t" << duracion2.count() << endl;
-                    //<< "\t " << duracion1.count() << endl;
+            archivo << n
+                    << "\t" << duracion1.count()
+                    << "\t" << duracion2.count()
+                    << "\t" << duracion3.count()
+                    << "\t" << duracion4.count()
+                    << endl;
             archivo.close();
         }
         else
@@ -104,7 +126,7 @@ int main()
     ofstream archivo(nameFileResult, std::ios::out);
     if (archivo.is_open())
     {
-        archivo << "tamaño del vector \t tiempo tardado random \t tiempo tardado Sweep" << endl;
+        archivo << "tamaño del vector \t tiempo tardado Sweep \t tiempo tardado random Universal \t tiempo tardado random FMR \t tiempo tardado random P Mersenne " << endl;
         archivo.close();
     }
     else
@@ -119,8 +141,8 @@ int main()
         for (int i = 0; i < n; ++i)
         {
             Point punto;
-            punto.x = static_cast<float>(rand()) / RAND_MAX; // Valor aleatorio en [0, 1)
-            punto.y = static_cast<float>(rand()) / RAND_MAX; // Valor aleatorio en [0, 1)
+            punto.x = static_cast<double>(rand()) / RAND_MAX; // Valor aleatorio en [0, 1)
+            punto.y = static_cast<double>(rand()) / RAND_MAX; // Valor aleatorio en [0, 1)
             points.push_back(punto);
         }
         vector<thread> hilos;

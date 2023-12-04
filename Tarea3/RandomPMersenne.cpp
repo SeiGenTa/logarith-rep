@@ -9,20 +9,11 @@ static bool debugMode = false;
 static bool showState = true;
 
 /*
-calculate the distance between two points
-*/
-float distanceBetweenTwoPoints(const Point *a, const Point *b)
-{
-    return sqrt(pow(a->x - b->x, 2) + (pow(a->y - b->y, 2)));
-}
-
-/*
 will return the distance min betweem two point selected randomly, n times
 (is possible the response not be correct)
 */
-float distanceRandom(vector<Point> &points, int length, int n, pair<Point, Point> &opti)
+double distanceRandomPmersenne(vector<Point> &points, int length, int n, pair<Point, Point> &opti)
 {
-
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> dist(0, length - 1);
@@ -38,7 +29,7 @@ float distanceRandom(vector<Point> &points, int length, int n, pair<Point, Point
     Point *pont1 = &points[num1];
     Point *pont2 = &points[num2];
 
-    float distanceMin = distanceBetweenTwoPoints(&points[num1], &points[num2]);
+    double distanceMin = distanceBetweenTwoPoints(&points[num1], &points[num2]);
     if (debugMode)
         cout << "initial distance min:  " << distanceMin << endl
              << "-------------------------------------------" << endl;
@@ -52,7 +43,7 @@ float distanceRandom(vector<Point> &points, int length, int n, pair<Point, Point
             num1 = rand() % length;
             num2 = rand() % length;
         }
-        float thisDistance = distanceBetweenTwoPoints(&points[num1], &points[num2]);
+        double thisDistance = distanceBetweenTwoPoints(&points[num1], &points[num2]);
         if (debugMode)
             cout << "distance calculated: " << thisDistance << endl;
 
@@ -72,92 +63,87 @@ float distanceRandom(vector<Point> &points, int length, int n, pair<Point, Point
 };
 
 // build the grids and save
-bool hashUniversal(vector<Point> &points, int &amountPoints, int &gridSize, vector<vector<vector<Point *>>> &grid)
+bool hashPMersenne(vector<Point> &points, int &amountPoints, int &gridSize, vector<vector<vector<Point *>>> &grid)
 {
-    for (int i = 0; i < amountPoints; i++)
-    {
-        Point *point = &points[i];
-        int valX = point->x * gridSize - 1;
-        int valY = point->y * gridSize - 1;
-        grid[valX][valY].push_back(point);
-    }
+    // AQUI SE DEBE PROGRAMAR EL HASH DE PRIMOS DE MERSENNE
+    //for (int i = 0; i < amountPoints; i++)
+    //{
+    //    Point *point = &points[i];
+    //    int valX = point->x * gridSize - 1;
+    //    int valY = point->y * gridSize - 1;
+    //    grid[valX][valY].push_back(point);
+    //}
     return true;
 };
 
-// Function that found the pair points comparing between points in the nere grids
-bool searchClosestPairInGrid(vector<vector<vector<Point *>>> *grid, pair<Point, Point> *min)
+// Function to get points in the specified area
+vector<Point *> &getPointsInAreaPMersenne(vector<vector<vector<Point *>>> *grid, int i, int j, int heightWidthGrid)
 {
-    float distanceMin = 2; //
+    static vector<Point *> pointsInArea; // Static for optimization
 
-    pair<Point *, Point *> pairPoints;
+    pointsInArea.clear();
+
+    for (int nx = i - 1; nx <= i + 1; nx++)
+    {
+        if (nx < 0 || nx >= heightWidthGrid)
+            continue;
+        for (int ny = j - 1; ny <= j + 1; ny++)
+        {
+            if (ny < 0 || ny >= heightWidthGrid)
+                continue;
+            for (Point *point : (*grid)[nx][ny])
+            {
+                pointsInArea.push_back(point);
+            }
+        }
+    }
+
+    return pointsInArea;
+}
+
+// Function that found the pair points comparing between points in the nere grids
+bool searchClosestPairInGridPMersenne(vector<vector<vector<Point *>>> *grid, pair<Point, Point> *min)
+{
+    double distanceMin = 1; //
+
+    pair<Point *, Point *> pairPoints = {nullptr, nullptr};
 
     int heightWidthGrid = grid->size();
     for (int i = 0; i < heightWidthGrid; i += 2)
     {
         for (int j = 0; j < heightWidthGrid; j += 2)
         {
-            vector<Point *> pointsInArea;
-
-            // Put the points pointers in the vector (the 9 closest grid)
-            for (int nx = i - 1; nx <= i + 1; nx++)
-            {
-                if (nx < 0 || nx >= heightWidthGrid)
-                    continue;
-                for (int ny = j - 1; ny <= j + 1; ny++)
-                {
-                    if (ny < 0 || ny >= heightWidthGrid)
-                        continue;
-                    for (Point *point : (*grid)[nx][ny])
-                    {
-                        pointsInArea.push_back(point);
-                    }
-                }
-            }
+            vector<Point *> &pointsInArea = getPointsInAreaPMersenne(grid, i, j, heightWidthGrid);
 
             // look for the pair point that is closest to each other
             for (int base = 0; base < pointsInArea.size(); base++)
             {
                 for (int comp = base + 1; comp < pointsInArea.size(); comp++)
                 {
-                    float distance = distanceBetweenTwoPoints(pointsInArea[base], pointsInArea[comp]);
+                    double distance = distanceBetweenTwoPoints(pointsInArea[base], pointsInArea[comp]);
                     if (distance < distanceMin)
                     {
                         distanceMin = distance;
                         pairPoints = {pointsInArea[base], pointsInArea[comp]};
+                    }
+                    if (distance == 0)
+                    {
+                        *min = {*(pairPoints.first), *(pairPoints.second)};
+                        return true;
                     }
                 }
             }
         }
     }
 
-    *min = {*pairPoints.first, *pairPoints.second};
-
+    *min = {*(pairPoints.first), *(pairPoints.second)};
     return true;
-}
-
-// Función para mostrar todos los puntos de la matriz con su ubicación
-void MostrarMatrizConPuntos(const std::vector<std::vector<std::vector<Point *>>> &matriz)
-{
-    for (size_t i = 0; i < matriz.size(); ++i)
-    {
-        for (size_t j = 0; j < matriz[i].size(); ++j)
-        {
-            for (size_t k = 0; k < matriz[i][j].size(); ++k)
-            {
-                if (matriz[i][j][k] != nullptr)
-                {
-                    std::cout << "Punto en (" << matriz[i][j][k]->x << "," << matriz[i][j][k]->y << ") ";
-                    std::cout << "Ubicado en la matriz en la posición [" << i << "][" << j << "][" << k << "]\n";
-                }
-            }
-        }
-    }
 }
 
 /*
 Function that found the pair of points that its distance is the min
 */
-pair<Point, Point> closestPairRandom(vector<Point> points)
+pair<Point, Point> closestPairRandomPMersenne(vector<Point> points)
 {
     srand(time(NULL));
     int lengthVPoints = points.size();
@@ -170,7 +156,7 @@ pair<Point, Point> closestPairRandom(vector<Point> points)
         cout << "Searching the min value" << endl;
     ;
 
-    float d = distanceRandom(points, lengthVPoints, lengthVPoints, thisMin);
+    double d = distanceRandomPmersenne(points, lengthVPoints, lengthVPoints, thisMin);
     if (debugMode)
         cout << "value min find: " << d << endl;
 
@@ -179,8 +165,11 @@ pair<Point, Point> closestPairRandom(vector<Point> points)
     if (d == 0)
         return thisMin;
 
+    if (d < 0.0001)
+        d = 0.0001; 
+
     int amountHeight = 0;
-    float sizeNow = 0;
+    double sizeNow = 0;
     if (debugMode || showState)
         cout << "calculated size of each grid" << endl;
     while (sizeNow < 1)
@@ -188,15 +177,17 @@ pair<Point, Point> closestPairRandom(vector<Point> points)
         sizeNow += d;
         amountHeight++;
     };
+    cout << "valor de tamaño actual: " << amountHeight << endl;
 
     vector<vector<vector<Point *>>> matriz(amountHeight, vector<vector<Point *>>(amountHeight));
 
     if (debugMode || showState)
         cout << "building the grid" << endl;
+    hashPMersenne(points, lengthVPoints, amountHeight, matriz);
 
-    hashUniversal(points, lengthVPoints, amountHeight, matriz);
-
-    MostrarMatrizConPuntos(matriz);
+    if (debugMode || showState)
+        cout << "searching the min point" << endl;
+    searchClosestPairInGridPMersenne(&matriz, &thisMin);
 
     return thisMin;
 }

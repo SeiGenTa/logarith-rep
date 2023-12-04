@@ -32,7 +32,7 @@ std::pair<Point, Point> encontrarParMasCercanoSweep(const std::vector<Point> &pu
     std::sort(puntosOrdenados.begin(), puntosOrdenados.end(), compararPorX);
 
     // Inicializar la distancia mínima
-    float distanciaMinima = std::numeric_limits<float>::max();
+    double distanciaMinima = std::numeric_limits<double>::max();
     std::pair<Point, Point> parMasCercano = {{0.0, 0.0}, {0.0, 0.0}};
 
     // Índices de los puntos más cercanos en la lista ordenada
@@ -44,7 +44,7 @@ std::pair<Point, Point> encontrarParMasCercanoSweep(const std::vector<Point> &pu
     {
         for (size_t j = i + 1; j < puntosOrdenados.size() && puntosOrdenados[j].x - puntosOrdenados[i].x < distanciaMinima; ++j)
         {
-            float distancia = calcularDistancia(puntosOrdenados[i], puntosOrdenados[j]);
+            double distancia = calcularDistancia(puntosOrdenados[i], puntosOrdenados[j]);
             if (distancia < distanciaMinima)
             {
                 distanciaMinima = distancia;
