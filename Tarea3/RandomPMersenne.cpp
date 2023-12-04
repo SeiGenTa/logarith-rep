@@ -62,19 +62,57 @@ double distanceRandomPmersenne(vector<Point> &points, int length, int n, pair<Po
     return distanceMin;
 };
 
-// build the grids and save
-bool hashPMersenne(vector<Point> &points, int &amountPoints, int &gridSize, vector<vector<vector<Point *>>> &grid)
-{
-    // AQUI SE DEBE PROGRAMAR EL HASH DE PRIMOS DE MERSENNE
-    //for (int i = 0; i < amountPoints; i++)
-    //{
-    //    Point *point = &points[i];
-    //    int valX = point->x * gridSize - 1;
-    //    int valY = point->y * gridSize - 1;
-    //    grid[valX][valY].push_back(point);
-    //}
-    return true;
+unsigned int generateMersennePrime(unsigned int p) {
+    return static_cast<unsigned int>(pow(2, p) - 1);
+}
+
+// Random bidimensional hash function using Mersenne prime numbers
+class HashFunction {
+public:
+    HashFunction(unsigned int size, unsigned int primeP) : size(size), primeP(primeP) {
+        // Initialize random number generator with Mersenne prime seed
+        std::mt19937 gen(primeP);
+
+        // Generate random coefficients for the hash function
+        std::uniform_int_distribution<unsigned int> dist(1, primeP - 1);
+        a = dist(gen);
+        b = dist(gen);
+    }
+
+    // Hash function
+    unsigned int hash(unsigned int x, unsigned int y) const {
+        return ((a * x + b * y) % primeP) % size;
+    }
+
+private:
+    unsigned int size;  // Size of the hash table
+    unsigned int primeP;  // Mersenne prime number
+    unsigned int a;  // Coefficient 'a' for the hash function
+    unsigned int b;  // Coefficient 'b' for the hash function
 };
+
+// build the grids and save
+bool hashPMersenne(std::vector<Point> &points, int &amountPoints, int &gridSize, std::vector<std::vector<std::vector<Point *>>> &grid) {
+    // Choose a Mersenne prime number for hashing
+    unsigned int primeP = 31; // You can choose a different prime 'p'
+    
+    // Initialize hash function
+    HashFunction hashFunction(gridSize, primeP);
+
+    for (int i = 0; i < amountPoints; i++) {
+        Point *point = &points[i];
+        int valX = point->x;
+        int valY = point->y;
+
+        // Use hash function to map coordinates to grid indices
+        int hashX = hashFunction.hash(valX, 0); // Use 0 as y-coordinate for 1D hash in X direction
+        int hashY = hashFunction.hash(valY, 1); // Use 1 as y-coordinate for 1D hash in Y direction
+
+        grid[hashX][hashY].push_back(point);
+    }
+    
+    return true;
+}
 
 // Function to get points in the specified area
 vector<Point *> &getPointsInAreaPMersenne(vector<vector<vector<Point *>>> *grid, int i, int j, int heightWidthGrid)
