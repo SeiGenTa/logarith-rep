@@ -91,14 +91,14 @@ int threadComplete(vector<Point> &points, int n, const std::string &nameFileResu
     cout << "finished FMR" << endl;
     resetearMatriz(matriz);
 
-    cout << "iniciando random P Mersene" << endl;
-    inicio = std::chrono::high_resolution_clock::now();
-    pair<Point, Point> parRandomPMersenne = closestPairRandomPMersenne(thisPoints, matriz);
-    fin = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> duracion4 = fin - inicio;
-    cout << "finished P Mersene" << endl;
-
-    resetearMatriz(matriz);
+    //cout << "iniciando random P Mersene" << endl;
+    //inicio = std::chrono::high_resolution_clock::now();
+    //pair<Point, Point> parRandomPMersenne = closestPairRandomPMersenne(thisPoints, matriz);
+    //fin = std::chrono::high_resolution_clock::now();
+    //std::chrono::duration<double> duracion4 = fin - inicio;
+    //cout << "finished P Mersene" << endl;
+//
+    //resetearMatriz(matriz);
 
     cout << "distance calculated in determinite: " << distanceBetweenTwoPoints(&parDeterminite.first, &parDeterminite.second)
          << ", the points is  (" << parDeterminite.second.x << " , " << parDeterminite.second.x << ") (" << parDeterminite.first.x
@@ -110,8 +110,8 @@ int threadComplete(vector<Point> &points, int n, const std::string &nameFileResu
     cout << "distance calculated in random FMR: " << distanceBetweenTwoPoints(&parRandomFMR.first, &parRandomFMR.second) << ", the points is  ("
          << parRandomFMR.second.x << " , " << parRandomFMR.second.x << ") (" << parRandomFMR.first.x << " , " << parRandomFMR.first.x << ") \n";
 
-    cout << "distance calculated in random P Mersene : " << distanceBetweenTwoPoints(&parRandomPMersenne.first, &parRandomPMersenne.second) << ", the points is  ("
-         << parRandomPMersenne.second.x << " , " << parRandomPMersenne.second.x << ") (" << parRandomPMersenne.first.x << " , " << parRandomPMersenne.first.x << ") \n";
+    //cout << "distance calculated in random P Mersene : " << distanceBetweenTwoPoints(&parRandomPMersenne.first, &parRandomPMersenne.second) << ", the points is  ("
+    //     << parRandomPMersenne.second.x << " , " << parRandomPMersenne.second.x << ") (" << parRandomPMersenne.first.x << " , " << parRandomPMersenne.first.x << ") \n";
 
     {
         lock_guard<mutex> lock(mtxResults);
@@ -122,7 +122,7 @@ int threadComplete(vector<Point> &points, int n, const std::string &nameFileResu
                     << "\t" << duracion1.count()
                     << "\t" << duracion2.count()
                     << "\t" << duracion3.count()
-                    << "\t" << duracion4.count()
+                    //<< "\t" << duracion4.count()
                     << endl;
             archivo.close();
         }
