@@ -4,6 +4,6 @@
 #include <vector>
 using namespace std;
 
-pair<Point, Point> closestPairRandomUniversal(vector<Point> points);
+pair<Point, Point> closestPairRandomUniversal(vector<Point> points, vector<vector<vector<Point *>>> &matriz);
 
 #endif

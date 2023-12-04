@@ -101,24 +101,23 @@ vector<Point *> &getPointsInAreaUni(vector<vector<vector<Point *>>> *grid, int i
 }
 
 // Function that found the pair points comparing between points in the nere grids
-bool searchClosestPairInGridUni(vector<vector<vector<Point *>>> *grid, pair<Point, Point> *min)
+bool searchClosestPairInGridUni(vector<vector<vector<Point *>>> *grid, pair<Point, Point> *min, int heightWidthGrid)
 {
     double distanceMin = 1; //
 
     pair<Point *, Point *> pairPoints = {nullptr, nullptr};
 
-    int heightWidthGrid = grid->size();
     for (int i = 0; i < heightWidthGrid; i += 2)
     {
         for (int j = 0; j < heightWidthGrid; j += 2)
         {
-            vector<Point *> &pointsInArea = getPointsInAreaUni(grid, i, j, heightWidthGrid);
-
+            vector<Point *> pointsInArea = getPointsInAreaUni(grid, i, j, heightWidthGrid);
             // look for the pair point that is closest to each other
             for (int base = 0; base < pointsInArea.size(); base++)
             {
                 for (int comp = base + 1; comp < pointsInArea.size(); comp++)
                 {
+
                     double distance = distanceBetweenTwoPoints(pointsInArea[base], pointsInArea[comp]);
                     if (distance < distanceMin)
                     {
@@ -127,8 +126,16 @@ bool searchClosestPairInGridUni(vector<vector<vector<Point *>>> *grid, pair<Poin
                     }
                     if (distance == 0)
                     {
-                        *min = {*(pairPoints.first), *(pairPoints.second)};
-                        return true;
+                        if (pairPoints.first && pairPoints.second) // Verificar si los punteros son diferentes de nullptr
+                        {
+                            *min = {*(pairPoints.first), *(pairPoints.second)};
+                            return true;
+                        }
+                        else
+                        {
+                            // Manejar el caso en el que al menos uno de los punteros es nullptr
+                            return false;
+                        }
                     }
                 }
             }
@@ -139,29 +146,10 @@ bool searchClosestPairInGridUni(vector<vector<vector<Point *>>> *grid, pair<Poin
     return true;
 }
 
-// Función para mostrar todos los puntos de la matriz con su ubicación
-void MostrarMatrizConPuntos(const std::vector<std::vector<std::vector<Point *>>> &matriz)
-{
-    for (size_t i = 0; i < matriz.size(); ++i)
-    {
-        for (size_t j = 0; j < matriz[i].size(); ++j)
-        {
-            for (size_t k = 0; k < matriz[i][j].size(); ++k)
-            {
-                if (matriz[i][j][k] != nullptr)
-                {
-                    std::cout << "Punto en (" << matriz[i][j][k]->x << "," << matriz[i][j][k]->y << ") ";
-                    std::cout << "Ubicado en la matriz en la posición [" << i << "][" << j << "][" << k << "]\n";
-                }
-            }
-        }
-    }
-}
-
 /*
 Function that found the pair of points that its distance is the min
 */
-pair<Point, Point> closestPairRandomUniversal(vector<Point> points, vector<vector<vector<Point *>>> matriz)
+pair<Point, Point> closestPairRandomUniversal(vector<Point> points, vector<vector<vector<Point *>>> &matriz)
 {
     srand(time(NULL));
     int lengthVPoints = points.size();
@@ -204,7 +192,7 @@ pair<Point, Point> closestPairRandomUniversal(vector<Point> points, vector<vecto
 
     if (debugMode || showState)
         cout << "searching the min point" << endl;
-    searchClosestPairInGridUni(&matriz, &thisMin);
+    searchClosestPairInGridUni(&matriz, &thisMin, amountHeight);
 
     return thisMin;
 }

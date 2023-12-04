@@ -62,14 +62,17 @@ double distanceRandomPmersenne(vector<Point> &points, int length, int n, pair<Po
     return distanceMin;
 };
 
-unsigned int generateMersennePrime(unsigned int p) {
+unsigned int generateMersennePrime(unsigned int p)
+{
     return static_cast<unsigned int>(pow(2, p) - 1);
 }
 
 // Random bidimensional hash function using Mersenne prime numbers
-class HashFunction {
+class HashFunction
+{
 public:
-    HashFunction(unsigned int size, unsigned int primeP) : size(size), primeP(primeP) {
+    HashFunction(unsigned int size, unsigned int primeP) : size(size), primeP(primeP)
+    {
         // Initialize random number generator with Mersenne prime seed
         std::mt19937 gen(primeP);
 
@@ -80,26 +83,29 @@ public:
     }
 
     // Hash function
-    unsigned int hash(unsigned int x, unsigned int y) const {
+    unsigned int hash(unsigned int x, unsigned int y) const
+    {
         return ((a * x + b * y) % primeP) % size;
     }
 
 private:
-    unsigned int size;  // Size of the hash table
-    unsigned int primeP;  // Mersenne prime number
-    unsigned int a;  // Coefficient 'a' for the hash function
-    unsigned int b;  // Coefficient 'b' for the hash function
+    unsigned int size;   // Size of the hash table
+    unsigned int primeP; // Mersenne prime number
+    unsigned int a;      // Coefficient 'a' for the hash function
+    unsigned int b;      // Coefficient 'b' for the hash function
 };
 
 // build the grids and save
-bool hashPMersenne(std::vector<Point> &points, int &amountPoints, int &gridSize, std::vector<std::vector<std::vector<Point *>>> &grid) {
+bool hashPMersenne(std::vector<Point> &points, int &amountPoints, int &gridSize, std::vector<std::vector<std::vector<Point *>>> &grid)
+{
     // Choose a Mersenne prime number for hashing
-    unsigned int primeP = 31; // You can choose a different prime 'p'
-    
+    unsigned int primeP = 8191; // You can choose a different prime 'p'
+
     // Initialize hash function
     HashFunction hashFunction(gridSize, primeP);
 
-    for (int i = 0; i < amountPoints; i++) {
+    for (int i = 0; i < amountPoints; i++)
+    {
         Point *point = &points[i];
         int valX = point->x;
         int valY = point->y;
@@ -110,7 +116,7 @@ bool hashPMersenne(std::vector<Point> &points, int &amountPoints, int &gridSize,
 
         grid[hashX][hashY].push_back(point);
     }
-    
+
     return true;
 }
 
@@ -140,24 +146,23 @@ vector<Point *> &getPointsInAreaPMersenne(vector<vector<vector<Point *>>> *grid,
 }
 
 // Function that found the pair points comparing between points in the nere grids
-bool searchClosestPairInGridPMersenne(vector<vector<vector<Point *>>> *grid, pair<Point, Point> *min)
+bool searchClosestPairInGridPMersenne(vector<vector<vector<Point *>>> *grid, pair<Point, Point> *min, int heightWidthGrid)
 {
     double distanceMin = 1; //
 
     pair<Point *, Point *> pairPoints = {nullptr, nullptr};
 
-    int heightWidthGrid = grid->size();
     for (int i = 0; i < heightWidthGrid; i += 2)
     {
         for (int j = 0; j < heightWidthGrid; j += 2)
         {
-            vector<Point *> &pointsInArea = getPointsInAreaPMersenne(grid, i, j, heightWidthGrid);
-
+            vector<Point *> pointsInArea = getPointsInAreaPMersenne(grid, i, j, heightWidthGrid);
             // look for the pair point that is closest to each other
             for (int base = 0; base < pointsInArea.size(); base++)
             {
                 for (int comp = base + 1; comp < pointsInArea.size(); comp++)
                 {
+
                     double distance = distanceBetweenTwoPoints(pointsInArea[base], pointsInArea[comp]);
                     if (distance < distanceMin)
                     {
@@ -166,8 +171,16 @@ bool searchClosestPairInGridPMersenne(vector<vector<vector<Point *>>> *grid, pai
                     }
                     if (distance == 0)
                     {
-                        *min = {*(pairPoints.first), *(pairPoints.second)};
-                        return true;
+                        if (pairPoints.first && pairPoints.second) // Verificar si los punteros son diferentes de nullptr
+                        {
+                            *min = {*(pairPoints.first), *(pairPoints.second)};
+                            return true;
+                        }
+                        else
+                        {
+                            // Manejar el caso en el que al menos uno de los punteros es nullptr
+                            return false;
+                        }
                     }
                 }
             }
@@ -181,7 +194,7 @@ bool searchClosestPairInGridPMersenne(vector<vector<vector<Point *>>> *grid, pai
 /*
 Function that found the pair of points that its distance is the min
 */
-pair<Point, Point> closestPairRandomPMersenne(vector<Point> points)
+pair<Point, Point> closestPairRandomPMersenne(vector<Point> points, vector<vector<vector<Point *>>> &matriz)
 {
     srand(time(NULL));
     int lengthVPoints = points.size();
@@ -204,7 +217,7 @@ pair<Point, Point> closestPairRandomPMersenne(vector<Point> points)
         return thisMin;
 
     if (d < 0.0001)
-        d = 0.0001; 
+        d = 0.0001;
 
     int amountHeight = 0;
     double sizeNow = 0;
@@ -217,16 +230,13 @@ pair<Point, Point> closestPairRandomPMersenne(vector<Point> points)
     };
     cout << "valor de tamaño actual: " << amountHeight << endl;
 
-    vector<vector<vector<Point *>>> matriz(amountHeight, vector<vector<Point *>>(amountHeight));
-
-
     if (debugMode || showState)
         cout << "building the grid" << endl;
     hashPMersenne(points, lengthVPoints, amountHeight, matriz);
 
     if (debugMode || showState)
         cout << "searching the min point" << endl;
-    searchClosestPairInGridPMersenne(&matriz, &thisMin);
+    searchClosestPairInGridPMersenne(&matriz, &thisMin,amountHeight);
 
     return thisMin;
 }

@@ -45,9 +45,24 @@ std::pair<Point, Point> encontrarParMasCercano(const std::vector<Point> &puntos)
     return parMasCercano;
 }
 
-// Función que realiza la ejecución en paralelo
-int threadComplete(vector<Point> points, int n, const std::string &nameFileResult)
+// Función para resetear la matriz
+void resetearMatriz(std::vector<std::vector<std::vector<Point *>>> &matriz)
 {
+    for (auto &nivel1 : matriz)
+    {
+        for (auto &nivel2 : nivel1)
+        {
+            nivel2.clear();
+        }
+    }
+}
+
+// Función que realiza la ejecución en paralelo
+int threadComplete(vector<Point> &points, int n, const std::string &nameFileResult)
+{
+    cout << "making the matrix for randoms" << endl;
+    vector<vector<vector<Point *>>> matriz(16384, vector<vector<Point *>>(16384));
+
     vector<Point>
         thisPoints(points);
     cout << "iniciando sweep" << endl;
@@ -56,23 +71,34 @@ int threadComplete(vector<Point> points, int n, const std::string &nameFileResul
     auto fin = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duracion1 = fin - inicio;
 
+    resetearMatriz(matriz);
+
     cout << "iniciando random Universal" << endl;
     inicio = std::chrono::high_resolution_clock::now();
-    pair<Point, Point> parRandom = closestPairRandomUniversal(thisPoints);
+    pair<Point, Point> parRandom = closestPairRandomUniversal(thisPoints, matriz);
     fin = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duracion2 = fin - inicio;
 
+    cout << "finished universal" << endl;
+    resetearMatriz(matriz);
+
     cout << "iniciando random FMR" << endl;
     inicio = std::chrono::high_resolution_clock::now();
-    pair<Point, Point> parRandomFMR = closestPairRandomFMR(thisPoints);
+    pair<Point, Point> parRandomFMR = closestPairRandomFMR(thisPoints, matriz);
     fin = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duracion3 = fin - inicio;
 
+    cout << "finished FMR" << endl;
+    resetearMatriz(matriz);
+
     cout << "iniciando random P Mersene" << endl;
     inicio = std::chrono::high_resolution_clock::now();
-    pair<Point, Point> parRandomPMersenne = closestPairRandomPMersenne(thisPoints);
+    pair<Point, Point> parRandomPMersenne = closestPairRandomPMersenne(thisPoints, matriz);
     fin = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duracion4 = fin - inicio;
+    cout << "finished P Mersene" << endl;
+
+    resetearMatriz(matriz);
 
     cout << "distance calculated in determinite: " << distanceBetweenTwoPoints(&parDeterminite.first, &parDeterminite.second)
          << ", the points is  (" << parDeterminite.second.x << " , " << parDeterminite.second.x << ") (" << parDeterminite.first.x
@@ -134,8 +160,6 @@ int main()
         cout << "a ocurrido un error" << endl;
         return 1;
     }
-
-    vector<vector<vector<Point *>>> matriz(16384, vector<vector<Point *>>(16384));
 
     for (int n = 5000000; n <= 50000000; n += 5000000)
     {

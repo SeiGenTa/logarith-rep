@@ -4,6 +4,6 @@
 #include <vector>
 using namespace std;
 
-pair<Point, Point> closestPairRandomPMersenne(vector<Point> points);
+pair<Point, Point> closestPairRandomPMersenne(vector<Point> points, vector<vector<vector<Point *>>> &matriz);
 
 #endif

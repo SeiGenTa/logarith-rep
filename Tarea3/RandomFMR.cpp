@@ -109,25 +109,24 @@ vector<Point *> &getPointsInAreaFMR(vector<vector<vector<Point *>>> *grid, int i
 }
 
 // Function that found the pair points comparing between points in the nere grids
-bool searchClosestPairInGridFMR(vector<vector<vector<Point *>>> *grid, pair<Point, Point> *min)
+bool searchClosestPairInGridFMR(vector<vector<vector<Point *>>> *grid, pair<Point, Point> *min, int heightWidthGrid)
 {
     double distanceMin = 1; //
 
     pair<Point *, Point *> pairPoints = {nullptr, nullptr};
 
-    int heightWidthGrid = grid->size();
     for (int i = 0; i < heightWidthGrid; i += 2)
     {
         for (int j = 0; j < heightWidthGrid; j += 2)
         {
             vector<Point *> &pointsInArea = getPointsInAreaFMR(grid, i, j, heightWidthGrid);
-
             // look for the pair point that is closest to each other
             for (int base = 0; base < pointsInArea.size(); base++)
             {
                 for (int comp = base + 1; comp < pointsInArea.size(); comp++)
                 {
                     double distance = distanceBetweenTwoPoints(pointsInArea[base], pointsInArea[comp]);
+
                     if (distance < distanceMin)
                     {
                         distanceMin = distance;
@@ -135,8 +134,16 @@ bool searchClosestPairInGridFMR(vector<vector<vector<Point *>>> *grid, pair<Poin
                     }
                     if (distance == 0)
                     {
-                        *min = {*(pairPoints.first), *(pairPoints.second)};
-                        return true;
+                        if (pairPoints.first && pairPoints.second) // Verificar si los punteros son diferentes de nullptr
+                        {
+                            *min = {*(pairPoints.first), *(pairPoints.second)};
+                            return true;
+                        }
+                        else
+                        {
+                            // Manejar el caso en el que al menos uno de los punteros es nullptr
+                            return false;
+                        }
                     }
                 }
             }
@@ -178,7 +185,7 @@ int searchBinary(const std::vector<int> &vector, int value, int &index)
 /*
 Function that found the pair of points that its distance is the min
 */
-pair<Point, Point> closestPairRandomFMR(vector<Point> points, vector<vector<vector<Point *>>> matriz)
+pair<Point, Point> closestPairRandomFMR(vector<Point> points, vector<vector<vector<Point *>>> &matriz)
 {
     srand(time(NULL));
     int lengthVPoints = points.size();
@@ -226,7 +233,7 @@ pair<Point, Point> closestPairRandomFMR(vector<Point> points, vector<vector<vect
 
     if (debugMode || showState)
         cout << "searching the min point" << endl;
-    searchClosestPairInGridFMR(&matriz, &thisMin);
+    searchClosestPairInGridFMR(&matriz, &thisMin,sizeGrill);
 
     return thisMin;
 }
