@@ -64,7 +64,7 @@ df = pd.read_csv(file_path)
 
 # List of attributes for which you want to generate histograms
 attributes_to_plot = ['tiempo tardado Sweep ', 'tiempo tardado random Universal ', 'tiempo tardado random FMR']
-
+i=0
 # Loop through each attribute
 for attribute_name in attributes_to_plot:
     # Create a histogram
@@ -77,7 +77,8 @@ for attribute_name in attributes_to_plot:
     plt.ylabel('Frecuencia')
 
     # Save the plot as an image (optional)
-    plt.savefig(f'resultados/{attribute_name}_histogram.png')
+    plt.savefig(f'resultados/{i}_histogram.png')
 
     # Show the plot
     plt.show()
+    i += 1
